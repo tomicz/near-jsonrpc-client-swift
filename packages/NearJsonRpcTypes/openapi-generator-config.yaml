@@ -1,0 +1,8 @@
+generate:
+  - types
+  - client
+accessModifier: public
+featureFlags:
+  - multipleContentTypes
+  - closedEnums
+  - strictOpenAPI
