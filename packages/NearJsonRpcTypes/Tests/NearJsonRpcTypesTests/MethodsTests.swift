@@ -56,17 +56,8 @@ final class MethodsTests: XCTestCase {
     
     func testPathMethodMappingConsistency() throws {
         // Test that pathToMethodMap and methodToPathMap are consistent
-        // Note: There's a special case where "/" maps to "EXPERIMENTAL_split_storage_info"
-        // and "EXPERIMENTAL_split_storage_info" maps to "/EXPERIMENTAL_split_storage_info"
         for (path, method) in pathToMethodMap {
-            if path == "/" {
-                // Special case: "/" maps to "EXPERIMENTAL_split_storage_info"
-                // but "EXPERIMENTAL_split_storage_info" maps to "/EXPERIMENTAL_split_storage_info"
-                XCTAssertEqual(method, "EXPERIMENTAL_split_storage_info")
-                XCTAssertEqual(methodToPathMap[method], "/EXPERIMENTAL_split_storage_info")
-            } else {
-                XCTAssertEqual(methodToPathMap[method], path)
-            }
+            XCTAssertEqual(methodToPathMap[method], path)
         }
         
         for (method, path) in methodToPathMap {

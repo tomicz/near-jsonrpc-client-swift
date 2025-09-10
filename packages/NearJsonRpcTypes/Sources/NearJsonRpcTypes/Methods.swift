@@ -6,7 +6,6 @@ import Foundation
 
 /// Maps OpenAPI paths to actual JSON-RPC method names
 public let pathToMethodMap: [String: String] = [
-    "/": "EXPERIMENTAL_split_storage_info",
     "/EXPERIMENTAL_changes": "EXPERIMENTAL_changes",
     "/EXPERIMENTAL_changes_in_block": "EXPERIMENTAL_changes_in_block",
     "/EXPERIMENTAL_congestion_level": "EXPERIMENTAL_congestion_level",
