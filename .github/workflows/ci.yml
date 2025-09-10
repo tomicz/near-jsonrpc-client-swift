@@ -9,16 +9,22 @@ on:
 jobs:
   test:
     name: Test & Build
-    runs-on: macos-latest
+    runs-on: macos-14
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Select Xcode version
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app
+
+      - name: Clean Derived Data
+        run: rm -rf ~/Library/Developer/Xcode/DerivedData
+
       - name: Setup Swift
         uses: swift-actions/setup-swift@v1
         with:
-          swift-version: "5.8"
+          swift-version: "5.9"
 
       - name: Cache dependencies
         uses: actions/cache@v3
@@ -28,10 +34,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-spm-
 
+      - name: Resolve dependencies
+        run: |
+          cd packages/NearJsonRpcTypes && swift package resolve
+          cd ../NearJsonRpcClient && swift package resolve
+
       - name: Test packages
         run: |
-          cd packages/NearJsonRpcTypes && swift test -Xswiftc -Xfrontend -Xswiftc -disable-availability-checking
-          cd ../NearJsonRpcClient && swift test -Xswiftc -Xfrontend -Xswiftc -disable-availability-checking
+          cd packages/NearJsonRpcTypes && swift test
+          cd ../NearJsonRpcClient && swift test
 
       - name: Test examples
         run: |
@@ -41,5 +52,5 @@ jobs:
 
       - name: Build packages
         run: |
-          cd packages/NearJsonRpcTypes && swift build -Xswiftc -Xfrontend -Xswiftc -disable-availability-checking
-          cd ../NearJsonRpcClient && swift build -Xswiftc -Xfrontend -Xswiftc -disable-availability-checking
+          cd packages/NearJsonRpcTypes && swift build
+          cd ../NearJsonRpcClient && swift build
