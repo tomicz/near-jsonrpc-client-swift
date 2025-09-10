@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Test & Build
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Swift
+        uses: swift-actions/setup-swift@v1
+        with:
+          swift-version: "5.10"
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: .build
+          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-spm-
+
+      - name: Test packages
+        run: |
+          cd packages/NearJsonRpcTypes && swift test
+          cd ../NearJsonRpcClient && swift test
+
+      - name: Test examples
+        run: |
+          cd examples/basic-usage && swift test
+          cd ../advanced-usage && swift test
+          cd ../types-usage && swift test
+
+      - name: Build packages
+        run: |
+          cd packages/NearJsonRpcTypes && swift build
+          cd ../NearJsonRpcClient && swift build
