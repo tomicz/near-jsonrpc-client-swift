@@ -1,4 +1,4 @@
-# GitHub Actions Setup
+# GitHu Actions Setup
 
 Simple CI workflow for automated testing.
 

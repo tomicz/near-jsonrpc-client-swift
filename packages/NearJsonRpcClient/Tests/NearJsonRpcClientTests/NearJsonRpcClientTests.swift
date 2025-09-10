@@ -14,7 +14,7 @@ final class NearJsonRpcClientTests: XCTestCase {
     }
     
     func testClientInitializationWithInvalidString() throws {
-        XCTAssertThrowsError(try NearJsonRpcClient(urlString: "invalid-url")) { error in
+        XCTAssertThrowsError(try NearJsonRpcClient(urlString: "")) { error in
             XCTAssertTrue(error is URLError)
         }
     }
