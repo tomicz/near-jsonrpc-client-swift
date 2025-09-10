@@ -19,3 +19,4 @@ final class NearJsonRpcClientTests: XCTestCase {
         }
     }
 }
+

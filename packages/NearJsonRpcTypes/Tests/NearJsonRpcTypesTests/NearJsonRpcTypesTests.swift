@@ -12,3 +12,4 @@ final class NearJsonRpcTypesTests: XCTestCase {
         XCTAssertTrue(NearJsonRpcTypes.version.contains("."))
     }
 }
+
