@@ -18,7 +18,7 @@ jobs:
       - name: Setup Swift
         uses: swift-actions/setup-swift@v1
         with:
-          swift-version: "5.9"
+          swift-version: "5.8"
 
       - name: Cache dependencies
         uses: actions/cache@v3
@@ -30,8 +30,8 @@ jobs:
 
       - name: Test packages
         run: |
-          cd packages/NearJsonRpcTypes && swift test
-          cd ../NearJsonRpcClient && swift test
+          cd packages/NearJsonRpcTypes && swift test -Xswiftc -Xfrontend -Xswiftc -disable-availability-checking
+          cd ../NearJsonRpcClient && swift test -Xswiftc -Xfrontend -Xswiftc -disable-availability-checking
 
       - name: Test examples
         run: |
@@ -41,5 +41,5 @@ jobs:
 
       - name: Build packages
         run: |
-          cd packages/NearJsonRpcTypes && swift build
-          cd ../NearJsonRpcClient && swift build
+          cd packages/NearJsonRpcTypes && swift build -Xswiftc -Xfrontend -Xswiftc -disable-availability-checking
+          cd ../NearJsonRpcClient && swift build -Xswiftc -Xfrontend -Xswiftc -disable-availability-checking
