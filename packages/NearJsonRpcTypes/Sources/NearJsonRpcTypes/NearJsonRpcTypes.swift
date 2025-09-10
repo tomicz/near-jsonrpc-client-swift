@@ -1,5 +1,4 @@
 import Foundation
-import OpenAPIRuntime
 
 /// NEAR Protocol JSON-RPC Types
 /// 
@@ -14,5 +13,7 @@ public struct NearJsonRpcTypes {
 }
 
 // MARK: - Re-exports
-// Re-export commonly used types from OpenAPIRuntime
-// Note: These will be available after OpenAPI generation
+// Re-export all types and methods for easy access
+@_exported import struct Foundation.URL
+@_exported import struct Foundation.Data
+@_exported import struct Foundation.Date
