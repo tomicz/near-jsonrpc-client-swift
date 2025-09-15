@@ -1,5 +1,5 @@
 // Auto-generated method mapping from NEAR OpenAPI spec
-// Generated on: 2025-01-27
+// Generated on: 2025-09-15 12:55:38 +0000
 // Do not edit manually - run 'swift package generate' to regenerate
 
 import Foundation
@@ -7,36 +7,36 @@ import Foundation
 /// Maps OpenAPI paths to actual JSON-RPC method names
 public let pathToMethodMap: [String: String] = [
     "/EXPERIMENTAL_changes": "EXPERIMENTAL_changes",
-    "/EXPERIMENTAL_changes_in_block": "EXPERIMENTAL_changes_in_block",
-    "/EXPERIMENTAL_congestion_level": "EXPERIMENTAL_congestion_level",
-    "/EXPERIMENTAL_genesis_config": "EXPERIMENTAL_genesis_config",
-    "/EXPERIMENTAL_light_client_block_proof": "EXPERIMENTAL_light_client_block_proof",
-    "/EXPERIMENTAL_light_client_proof": "EXPERIMENTAL_light_client_proof",
-    "/EXPERIMENTAL_maintenance_windows": "EXPERIMENTAL_maintenance_windows",
-    "/EXPERIMENTAL_protocol_config": "EXPERIMENTAL_protocol_config",
+    "/light_client_proof": "light_client_proof",
+    "/send_tx": "send_tx",
+    "/chunk": "chunk",
+    "/maintenance_windows": "maintenance_windows",
+    "/next_light_client_block": "next_light_client_block",
     "/EXPERIMENTAL_receipt": "EXPERIMENTAL_receipt",
+    "/status": "status",
+    "/block_effects": "block_effects",
+    "/EXPERIMENTAL_light_client_proof": "EXPERIMENTAL_light_client_proof",
+    "/health": "health",
+    "/EXPERIMENTAL_validators_ordered": "EXPERIMENTAL_validators_ordered",
+    "/changes": "changes",
+    "/gas_price": "gas_price",
     "/EXPERIMENTAL_split_storage_info": "EXPERIMENTAL_split_storage_info",
     "/EXPERIMENTAL_tx_status": "EXPERIMENTAL_tx_status",
-    "/EXPERIMENTAL_validators_ordered": "EXPERIMENTAL_validators_ordered",
-    "/block": "block",
-    "/block_effects": "block_effects",
-    "/broadcast_tx_async": "broadcast_tx_async",
-    "/broadcast_tx_commit": "broadcast_tx_commit",
-    "/changes": "changes",
-    "/chunk": "chunk",
-    "/client_config": "client_config",
-    "/gas_price": "gas_price",
-    "/genesis_config": "genesis_config",
-    "/health": "health",
-    "/light_client_proof": "light_client_proof",
-    "/maintenance_windows": "maintenance_windows",
-    "/network_info": "network_info",
-    "/next_light_client_block": "next_light_client_block",
-    "/query": "query",
-    "/send_tx": "send_tx",
-    "/status": "status",
     "/tx": "tx",
-    "/validators": "validators"
+    "/EXPERIMENTAL_maintenance_windows": "EXPERIMENTAL_maintenance_windows",
+    "/validators": "validators",
+    "/broadcast_tx_commit": "broadcast_tx_commit",
+    "/block": "block",
+    "/EXPERIMENTAL_genesis_config": "EXPERIMENTAL_genesis_config",
+    "/network_info": "network_info",
+    "/EXPERIMENTAL_protocol_config": "EXPERIMENTAL_protocol_config",
+    "/EXPERIMENTAL_changes_in_block": "EXPERIMENTAL_changes_in_block",
+    "/genesis_config": "genesis_config",
+    "/EXPERIMENTAL_light_client_block_proof": "EXPERIMENTAL_light_client_block_proof",
+    "/query": "query",
+    "/EXPERIMENTAL_congestion_level": "EXPERIMENTAL_congestion_level",
+    "/client_config": "client_config",
+    "/broadcast_tx_async": "broadcast_tx_async"
 ]
 
 /// Reverse mapping for convenience
@@ -56,39 +56,37 @@ public typealias RpcMethod = String
 
 /// Common RPC methods
 public enum CommonRpcMethods {
+    public static let EXPERIMENTALChanges = "EXPERIMENTAL_changes"
+    public static let EXPERIMENTALChangesInBlock = "EXPERIMENTAL_changes_in_block"
+    public static let EXPERIMENTALCongestionLevel = "EXPERIMENTAL_congestion_level"
+    public static let EXPERIMENTALGenesisConfig = "EXPERIMENTAL_genesis_config"
+    public static let EXPERIMENTALLightClientBlockProof = "EXPERIMENTAL_light_client_block_proof"
+    public static let EXPERIMENTALLightClientProof = "EXPERIMENTAL_light_client_proof"
+    public static let EXPERIMENTALMaintenanceWindows = "EXPERIMENTAL_maintenance_windows"
+    public static let EXPERIMENTALProtocolConfig = "EXPERIMENTAL_protocol_config"
+    public static let EXPERIMENTALReceipt = "EXPERIMENTAL_receipt"
+    public static let EXPERIMENTALSplitStorageInfo = "EXPERIMENTAL_split_storage_info"
+    public static let EXPERIMENTALTxStatus = "EXPERIMENTAL_tx_status"
+    public static let EXPERIMENTALValidatorsOrdered = "EXPERIMENTAL_validators_ordered"
     public static let block = "block"
-    public static let chunk = "chunk"
-    public static let status = "status"
-    public static let query = "query"
-    public static let validators = "validators"
-    public static let networkInfo = "network_info"
-    public static let gasPrice = "gas_price"
-    public static let health = "health"
-    public static let genesisConfig = "genesis_config"
-    public static let clientConfig = "client_config"
+    public static let blockEffects = "block_effects"
     public static let broadcastTxAsync = "broadcast_tx_async"
     public static let broadcastTxCommit = "broadcast_tx_commit"
-    public static let sendTx = "send_tx"
-    public static let tx = "tx"
     public static let changes = "changes"
-    public static let blockEffects = "block_effects"
+    public static let chunk = "chunk"
+    public static let clientConfig = "client_config"
+    public static let gasPrice = "gas_price"
+    public static let genesisConfig = "genesis_config"
+    public static let health = "health"
     public static let lightClientProof = "light_client_proof"
-    public static let nextLightClientBlock = "next_light_client_block"
     public static let maintenanceWindows = "maintenance_windows"
-    
-    // Experimental methods
-    public static let experimentalChanges = "EXPERIMENTAL_changes"
-    public static let experimentalChangesInBlock = "EXPERIMENTAL_changes_in_block"
-    public static let experimentalCongestionLevel = "EXPERIMENTAL_congestion_level"
-    public static let experimentalGenesisConfig = "EXPERIMENTAL_genesis_config"
-    public static let experimentalLightClientBlockProof = "EXPERIMENTAL_light_client_block_proof"
-    public static let experimentalLightClientProof = "EXPERIMENTAL_light_client_proof"
-    public static let experimentalMaintenanceWindows = "EXPERIMENTAL_maintenance_windows"
-    public static let experimentalProtocolConfig = "EXPERIMENTAL_protocol_config"
-    public static let experimentalReceipt = "EXPERIMENTAL_receipt"
-    public static let experimentalSplitStorageInfo = "EXPERIMENTAL_split_storage_info"
-    public static let experimentalTxStatus = "EXPERIMENTAL_tx_status"
-    public static let experimentalValidatorsOrdered = "EXPERIMENTAL_validators_ordered"
+    public static let networkInfo = "network_info"
+    public static let nextLightClientBlock = "next_light_client_block"
+    public static let query = "query"
+    public static let sendTx = "send_tx"
+    public static let status = "status"
+    public static let tx = "tx"
+    public static let validators = "validators"
 }
 
 /// Helper functions for method validation

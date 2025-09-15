@@ -18,12 +18,16 @@ struct CodeGenerator {
         print("\n💾 Step 3: Saving spec locally...")
         try saveSpecLocally(spec)
         
-        // Step 4: Handle NEAR-specific quirks
-        print("\n🔧 Step 4: Handling NEAR-specific quirks...")
-        try await handleNearQuirks(from: spec)
+        // Step 4: Extract path-to-method mapping
+        print("\n🔧 Step 4: Extracting path-to-method mapping...")
+        let pathToMethodMap = try await extractPathToMethodMap(from: spec)
         
-        // Step 5: Generate Swift types using Apple's OpenAPI Generator
-        print("\n🔧 Step 5: Generating Swift types...")
+        // Step 5: Generate method mapping file
+        print("\n🔧 Step 5: Generating method mapping file...")
+        try generateMethodMappingFile(pathToMethodMap)
+        
+        // Step 6: Generate Swift types using Apple's OpenAPI Generator
+        print("\n🔧 Step 6: Generating Swift types...")
         try await generateSwiftTypes(from: spec)
         
         print("\n✅ Code generation completed!")
@@ -78,7 +82,16 @@ struct CodeGenerator {
     }
     
     static func saveSpecLocally(_ data: Data) throws {
-        let specPath = URL(fileURLWithPath: "openapi-spec.json")
+        // Get the project root directory (go up from Tools/CodeGenerator/Sources/CodeGenerator/)
+        let currentFile = URL(fileURLWithPath: #file)
+        let projectRoot = currentFile
+            .deletingLastPathComponent() // Remove main.swift
+            .deletingLastPathComponent() // Remove CodeGenerator/
+            .deletingLastPathComponent() // Remove Sources/
+            .deletingLastPathComponent() // Remove CodeGenerator/
+            .deletingLastPathComponent() // Remove Tools/
+        
+        let specPath = projectRoot.appendingPathComponent("openapi-spec.json")
         try data.write(to: specPath)
         print("   💾 Saved spec to: \(specPath.path)")
         
@@ -105,74 +118,141 @@ struct CodeGenerator {
         }
     }
     
-    static func handleNearQuirks(from specData: Data) async throws {
-        print("   🔧 Analyzing NEAR-specific quirks...")
+    static func snakeToCamel(_ str: String) -> String {
+        let components = str.components(separatedBy: "_")
+        guard let first = components.first else { return str }
+        let rest = components.dropFirst().map { $0.capitalized }
+        return first + rest.joined()
+    }
+    
+    static func extractPathToMethodMap(from specData: Data) async throws -> [String: String] {
+        print("   🔧 Extracting path-to-method mapping from OpenAPI spec...")
         
         guard let spec = try? JSONSerialization.jsonObject(with: specData) as? [String: Any],
               let paths = spec["paths"] as? [String: Any] else {
-            print("   ⚠️ Warning: Could not parse OpenAPI spec for quirks analysis")
-            return
+            throw CodeGeneratorError.specAnalysisFailed
         }
         
-        // Problem 1: Endpoint Override
-        print("   🎯 Problem 1: Endpoint Override")
-        print("   📋 OpenAPI spec uses individual paths:")
+        var pathToMethodMap: [String: String] = [:]
         
-        let originalPaths = Array(paths.keys).sorted()
-        for path in originalPaths.prefix(5) {
-            print("      - \(path)")
-        }
-        if originalPaths.count > 5 {
-            print("      ... and \(originalPaths.count - 5) more")
-        }
-        
-        print("   🔧 Solution: All JSON-RPC calls use endpoint '/' with method in body")
-        
-        // Problem 2: Case Conversion Analysis
-        print("   🎯 Problem 2: Case Conversion")
-        print("   📋 API returns snake_case, Swift expects camelCase")
-        
-        // Analyze some example schemas for case patterns
-        if let components = spec["components"] as? [String: Any],
-           let schemas = components["schemas"] as? [String: Any] {
-            
-            let schemaNames = Array(schemas.keys).sorted()
-            let snakeCaseExamples = schemaNames.filter { $0.contains("_") }.prefix(3)
-            
-            if !snakeCaseExamples.isEmpty {
-                print("   📋 Examples of snake_case in schemas:")
-                for example in snakeCaseExamples {
-                    print("      - \(example)")
-                }
+        for (path, pathSpec) in paths {
+            if let pathDict = pathSpec as? [String: Any],
+               let post = pathDict["post"] as? [String: Any],
+               let operationId = post["operationId"] as? String {
+                pathToMethodMap[path] = operationId
+            } else {
+                print("   ⚠️ Warning: Path \(path) has no operationId, skipping...")
             }
         }
         
-        print("   🔧 Solution: Convert snake_case ↔ camelCase automatically")
+        print("   📋 Extracted \(pathToMethodMap.count) method mappings from OpenAPI spec")
+        print("   📋 First few mappings:")
+        for (path, method) in Array(pathToMethodMap.prefix(5)) {
+            print("      - \(path) → \(method)")
+        }
+        if pathToMethodMap.count > 5 {
+            print("      ... and \(pathToMethodMap.count - 5) more")
+        }
         
-        // Create a fixed spec with corrected endpoints
-        print("   🔧 Creating corrected OpenAPI spec...")
+        return pathToMethodMap
+    }
+    
+    static func generateMethodMappingFile(_ pathToMethodMap: [String: String]) throws {
+        print("   🔧 Generating method mapping file...")
         
-        // Override all paths to use "/"
-        let correctedPaths: [String: Any] = ["/": paths.values.first ?? [:]]
+        let methodMappingContent = """
+        // Auto-generated method mapping from NEAR OpenAPI spec
+        // Generated on: \(Date())
+        // Do not edit manually - run 'swift package generate' to regenerate
+
+        import Foundation
+
+        /// Maps OpenAPI paths to actual JSON-RPC method names
+        public let pathToMethodMap: [String: String] = [
+        \(pathToMethodMap.map { "    \"\($0.key)\": \"\($0.value)\"" }.joined(separator: ",\n"))
+        ]
+
+        /// Reverse mapping for convenience
+        public let methodToPathMap: [String: String] = {
+            var map: [String: String] = [:]
+            for (path, method) in pathToMethodMap {
+                map[method] = path
+            }
+            return map
+        }()
+
+        /// Available RPC methods
+        public let rpcMethods: [String] = Array(pathToMethodMap.values).sorted()
+
+        /// RPC method type
+        public typealias RpcMethod = String
+
+        /// Common RPC methods
+        public enum CommonRpcMethods {
+        \(pathToMethodMap.values.sorted().map { method in
+            let camelCase = snakeToCamel(method)
+            return "    public static let \(camelCase) = \"\(method)\""
+        }.joined(separator: "\n"))
+        }
+
+        /// Helper functions for method validation
+        public struct RpcMethodValidator {
+            /// Check if a method is valid
+            public static func isValid(_ method: String) -> Bool {
+                return rpcMethods.contains(method)
+            }
+            
+            /// Get the path for a given method
+            public static func path(for method: String) -> String? {
+                return methodToPathMap[method]
+            }
+            
+            /// Get the method for a given path
+            public static func method(for path: String) -> String? {
+                return pathToMethodMap[path]
+            }
+            
+            /// Get all available methods
+            public static func allMethods() -> [String] {
+                return rpcMethods
+            }
+            
+            /// Get all experimental methods
+            public static func experimentalMethods() -> [String] {
+                return rpcMethods.filter { $0.hasPrefix("EXPERIMENTAL_") }
+            }
+            
+            /// Get all stable methods
+            public static func stableMethods() -> [String] {
+                return rpcMethods.filter { !$0.hasPrefix("EXPERIMENTAL_") }
+            }
+        }
+        """
         
-        var correctedSpec = spec
-        correctedSpec["paths"] = correctedPaths
+        // Get the project root directory (go up from Tools/CodeGenerator/Sources/CodeGenerator/)
+        let currentFile = URL(fileURLWithPath: #file)
+        let projectRoot = currentFile
+            .deletingLastPathComponent() // Remove main.swift
+            .deletingLastPathComponent() // Remove CodeGenerator/
+            .deletingLastPathComponent() // Remove Sources/
+            .deletingLastPathComponent() // Remove CodeGenerator/
+            .deletingLastPathComponent() // Remove Tools/
         
-        // Save the corrected spec
-        let correctedData = try JSONSerialization.data(withJSONObject: correctedSpec, options: .prettyPrinted)
-        let correctedSpecFile = URL(fileURLWithPath: "openapi-spec-corrected.json")
-        try correctedData.write(to: correctedSpecFile)
+        let methodsFile = projectRoot
+            .appendingPathComponent("packages")
+            .appendingPathComponent("NearJsonRpcTypes")
+            .appendingPathComponent("Sources")
+            .appendingPathComponent("NearJsonRpcTypes")
+            .appendingPathComponent("Methods.swift")
+        try methodMappingContent.write(to: methodsFile, atomically: true, encoding: .utf8)
         
-        print("   ✅ NEAR quirks analysis completed!")
-        print("   📁 Corrected spec saved to: openapi-spec-corrected.json")
-        print("   📊 Original paths: \(originalPaths.count)")
-        print("   📊 Corrected paths: 1 (all use '/')")
+        print("   ✅ Method mapping file generated: Methods.swift")
     }
     
     static func generateSwiftTypes(from specData: Data) async throws {
         print("   🔧 Preparing for Swift type generation...")
         
-        // For now, let's analyze the spec structure
+        // Use the original OpenAPI spec (no correction needed)
         if let spec = try? JSONSerialization.jsonObject(with: specData) as? [String: Any] {
             let paths = spec["paths"] as? [String: Any] ?? [:]
             let components = spec["components"] as? [String: Any] ?? [:]
@@ -180,10 +260,16 @@ struct CodeGenerator {
             
             print("   📊 Found \(paths.count) API paths")
             print("   📊 Found \(schemas.count) schema definitions")
-            print("   ✅ Spec analysis completed!")
+            print("   ✅ Using original OpenAPI spec (no correction needed)")
+            print("   📋 Path-to-method mapping will handle JSON-RPC endpoint differences")
         } else {
             print("   ⚠️ Warning: Could not parse OpenAPI spec as JSON")
         }
+        
+        // TODO: Integrate with Apple's Swift OpenAPI Generator
+        // For now, we're using the original spec and letting the path-to-method mapping
+        // handle the difference between OpenAPI paths and JSON-RPC method names
+        print("   🔧 Swift OpenAPI Generator integration coming soon...")
     }
 }
 
