@@ -78,11 +78,11 @@ final class MethodsTests: XCTestCase {
     }
     
     func testExperimentalRpcMethods() throws {
-        XCTAssertEqual(CommonRpcMethods.experimentalChanges, "EXPERIMENTAL_changes")
-        XCTAssertEqual(CommonRpcMethods.experimentalCongestionLevel, "EXPERIMENTAL_congestion_level")
-        XCTAssertEqual(CommonRpcMethods.experimentalGenesisConfig, "EXPERIMENTAL_genesis_config")
-        XCTAssertEqual(CommonRpcMethods.experimentalSplitStorageInfo, "EXPERIMENTAL_split_storage_info")
-        XCTAssertEqual(CommonRpcMethods.experimentalTxStatus, "EXPERIMENTAL_tx_status")
+        XCTAssertEqual(CommonRpcMethods.EXPERIMENTALChanges, "EXPERIMENTAL_changes")
+        XCTAssertEqual(CommonRpcMethods.EXPERIMENTALCongestionLevel, "EXPERIMENTAL_congestion_level")
+        XCTAssertEqual(CommonRpcMethods.EXPERIMENTALGenesisConfig, "EXPERIMENTAL_genesis_config")
+        XCTAssertEqual(CommonRpcMethods.EXPERIMENTALSplitStorageInfo, "EXPERIMENTAL_split_storage_info")
+        XCTAssertEqual(CommonRpcMethods.EXPERIMENTALTxStatus, "EXPERIMENTAL_tx_status")
     }
     
     // MARK: - RpcMethodValidator Tests
