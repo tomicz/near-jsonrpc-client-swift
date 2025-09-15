@@ -1,0 +1,13 @@
+---
+description: Rules about github repo and near json client reference
+globs:
+alwaysApply: true
+---
+
+### Do not push
+
+- There is a reference project at root/near-jsonrpc-client-ts-reference/
+- It is an example for cursor to use. This project is built from near-jsonrpc-client-ts-reference/ as an example.
+- Cursor is not suppose to push near-jsonrpc-client-ts-reference/ to github repo.
+- Should not be added to .gitignore either.
+- Use it only locally as a reference. Should be ignored from git add when commiting other changes.
