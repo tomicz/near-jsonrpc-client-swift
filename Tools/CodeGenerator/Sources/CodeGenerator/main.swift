@@ -90,6 +90,7 @@ struct CodeGenerator {
             .deletingLastPathComponent() // Remove Sources/
             .deletingLastPathComponent() // Remove CodeGenerator/
             .deletingLastPathComponent() // Remove Tools/
+            .appendingPathComponent("near-jsonrpc-client-swift")
         
         let specPath = projectRoot.appendingPathComponent("openapi-spec.json")
         try data.write(to: specPath)
@@ -237,6 +238,9 @@ struct CodeGenerator {
             .deletingLastPathComponent() // Remove Sources/
             .deletingLastPathComponent() // Remove CodeGenerator/
             .deletingLastPathComponent() // Remove Tools/
+            .appendingPathComponent("near-jsonrpc-client-swift")
+        
+        print("   📁 Project root: \(projectRoot.path)")
         
         let methodsFile = projectRoot
             .appendingPathComponent("packages")
@@ -244,6 +248,8 @@ struct CodeGenerator {
             .appendingPathComponent("Sources")
             .appendingPathComponent("NearJsonRpcTypes")
             .appendingPathComponent("Methods.swift")
+        
+        print("   📁 Methods file path: \(methodsFile.path)")
         try methodMappingContent.write(to: methodsFile, atomically: true, encoding: .utf8)
         
         print("   ✅ Method mapping file generated: Methods.swift")
@@ -252,24 +258,49 @@ struct CodeGenerator {
     static func generateSwiftTypes(from specData: Data) async throws {
         print("   🔧 Preparing for Swift type generation...")
         
-        // Use the original OpenAPI spec (no correction needed)
-        if let spec = try? JSONSerialization.jsonObject(with: specData) as? [String: Any] {
-            let paths = spec["paths"] as? [String: Any] ?? [:]
-            let components = spec["components"] as? [String: Any] ?? [:]
-            let schemas = components["schemas"] as? [String: Any] ?? [:]
-            
-            print("   📊 Found \(paths.count) API paths")
-            print("   📊 Found \(schemas.count) schema definitions")
-            print("   ✅ Using original OpenAPI spec (no correction needed)")
-            print("   📋 Path-to-method mapping will handle JSON-RPC endpoint differences")
-        } else {
-            print("   ⚠️ Warning: Could not parse OpenAPI spec as JSON")
+        guard let spec = try? JSONSerialization.jsonObject(with: specData) as? [String: Any],
+              let components = spec["components"] as? [String: Any],
+              let schemas = components["schemas"] as? [String: Any] else {
+            print("   ❌ Failed to parse OpenAPI spec")
+            return
         }
         
-        // TODO: Integrate with Apple's Swift OpenAPI Generator
-        // For now, we're using the original spec and letting the path-to-method mapping
-        // handle the difference between OpenAPI paths and JSON-RPC method names
-        print("   🔧 Swift OpenAPI Generator integration coming soon...")
+        print("   📊 Found \(schemas.count) schema definitions")
+        
+        // Parse all schemas
+        let schemaParser = OpenAPISchemaParser()
+        let swiftTypes = try schemaParser.parseSchemas(schemas)
+        
+        // Generate Swift code
+        let swiftGenerator = SwiftTypeGenerator()
+        let swiftCode = swiftGenerator.generateTypes(swiftTypes)
+        
+        // Write to Types.swift
+        try writeTypesFile(swiftCode)
+        
+        print("   ✅ Generated Swift types from OpenAPI schemas")
+    }
+    
+    static func writeTypesFile(_ content: String) throws {
+        // Get the project root directory
+        let currentFile = URL(fileURLWithPath: #file)
+        let projectRoot = currentFile
+            .deletingLastPathComponent() // Remove main.swift
+            .deletingLastPathComponent() // Remove CodeGenerator/
+            .deletingLastPathComponent() // Remove Sources/
+            .deletingLastPathComponent() // Remove CodeGenerator/
+            .deletingLastPathComponent() // Remove Tools/
+            .appendingPathComponent("near-jsonrpc-client-swift")
+        
+        let typesFile = projectRoot
+            .appendingPathComponent("packages")
+            .appendingPathComponent("NearJsonRpcTypes")
+            .appendingPathComponent("Sources")
+            .appendingPathComponent("NearJsonRpcTypes")
+            .appendingPathComponent("Types.swift")
+        
+        try content.write(to: typesFile, atomically: true, encoding: .utf8)
+        print("   ✅ Types.swift generated successfully")
     }
 }
 

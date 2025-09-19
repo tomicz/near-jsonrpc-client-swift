@@ -23,6 +23,7 @@ cd examples/basic-usage && swift run
 ```
 
 **Features:**
+
 - ✅ Node status with detailed information
 - ✅ Latest block with full metadata
 - ✅ Gas price and network economics
@@ -32,6 +33,7 @@ cd examples/basic-usage && swift run
 - ✅ Health checks
 
 **Key Benefits:**
+
 - Comprehensive RPC method usage
 - Detailed response parsing
 - Error handling and validation
@@ -47,6 +49,7 @@ cd examples/advanced-usage && swift run
 ```
 
 **Features:**
+
 - ✅ Account information queries
 - ✅ Block queries by specific height
 - ✅ Validator information
@@ -55,6 +58,7 @@ cd examples/advanced-usage && swift run
 - ✅ Error handling patterns
 
 **Key Benefits:**
+
 - Real-world blockchain operations
 - Complex query scenarios
 - Advanced error handling
@@ -69,6 +73,7 @@ cd examples/transaction-examples && swift run
 ```
 
 **Features:**
+
 - ✅ Account information before transactions
 - ✅ Block context and gas price queries
 - ✅ Transaction broadcasting (async vs commit)
@@ -77,6 +82,7 @@ cd examples/transaction-examples && swift run
 - ✅ Real transaction examples with proper error handling
 
 **Key Benefits:**
+
 - Complete transaction workflow
 - Broadcasting strategies
 - Status monitoring
@@ -92,6 +98,7 @@ cd examples/contract-examples && swift run
 ```
 
 **Features:**
+
 - ✅ Contract code and state viewing
 - ✅ View function calls with parameters
 - ✅ Access key management
@@ -100,6 +107,7 @@ cd examples/contract-examples && swift run
 - ✅ Contract interaction error handling
 
 **Key Benefits:**
+
 - Smart contract development
 - Contract inspection
 - Function calling patterns
@@ -115,6 +123,7 @@ cd examples/error-handling-examples && swift run
 ```
 
 **Features:**
+
 - ✅ Comprehensive error categorization
 - ✅ Retry mechanisms with exponential backoff
 - ✅ Fallback strategies for network issues
@@ -124,6 +133,7 @@ cd examples/error-handling-examples && swift run
 - ✅ Graceful degradation strategies
 
 **Key Benefits:**
+
 - Production error handling
 - Network resilience
 - User experience optimization
@@ -139,6 +149,7 @@ cd examples/validation-examples && swift run
 ```
 
 **Features:**
+
 - ✅ RPC method validation (31 methods tested)
 - ✅ Parameter validation patterns
 - ✅ Account ID validation (11 test cases)
@@ -149,6 +160,7 @@ cd examples/validation-examples && swift run
 - ✅ Type validation and conversion
 
 **Key Benefits:**
+
 - Input validation
 - Security best practices
 - Type safety enforcement
@@ -164,6 +176,7 @@ cd examples/typed-usage && swift run
 ```
 
 **Features:**
+
 - ✅ Type-safe operations with generated types
 - ✅ Compile-time type safety
 - ✅ Auto-completion and IntelliSense
@@ -173,6 +186,7 @@ cd examples/typed-usage && swift run
 - ✅ Advanced error handling
 
 **Key Benefits:**
+
 - Compile-time safety
 - Developer productivity
 - Code maintainability
@@ -188,6 +202,7 @@ cd examples/types-usage && swift run
 ```
 
 **Features:**
+
 - ✅ Using exported generated types
 - ✅ Type-safe parsing vs manual parsing
 - ✅ Benefits of compile-time type safety
@@ -195,6 +210,7 @@ cd examples/types-usage && swift run
 - ✅ Clean, maintainable code structure
 
 **Key Benefits:**
+
 - Type safety demonstration
 - Manual vs typed comparison
 - Code quality improvement
@@ -384,7 +400,7 @@ func retryRequest<T>(
     operation: @escaping () async throws -> T
 ) async throws -> T {
     var lastError: Error?
-    
+
     for attempt in 1...maxRetries {
         do {
             return try await operation()
@@ -395,7 +411,7 @@ func retryRequest<T>(
             }
         }
     }
-    
+
     throw lastError ?? NSError(domain: "RetryError", code: -1, userInfo: [NSLocalizedDescriptionKey: "All retry attempts failed"])
 }
 ```
@@ -450,7 +466,7 @@ import NearJsonRpcClient
 struct ContentView: View {
     @State private var blockHeight: Int = 0
     @State private var isLoading = false
-    
+
     var body: some View {
         VStack {
             if isLoading {
@@ -463,11 +479,11 @@ struct ContentView: View {
             await loadBlockHeight()
         }
     }
-    
+
     private func loadBlockHeight() async {
         isLoading = true
         defer { isLoading = false }
-        
+
         do {
             let client = try NearJsonRpcClient(urlString: "https://rpc.testnet.near.org")
             let response = try await client.request(method: "block", params: ["finality": "final"])
@@ -488,12 +504,12 @@ import NearJsonRpcClient
 class NearService: ObservableObject {
     @Published var blockHeight: Int = 0
     @Published var isLoading = false
-    
+
     private var cancellables = Set<AnyCancellable>()
-    
+
     func loadBlockHeight() {
         isLoading = true
-        
+
         Task {
             do {
                 let client = try NearJsonRpcClient(urlString: "https://rpc.testnet.near.org")

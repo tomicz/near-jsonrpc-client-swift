@@ -165,6 +165,7 @@ let stableMethods = RpcMethodValidator.stableMethods()
 ## Supported RPC Methods
 
 ### Core Methods (8)
+
 - `block` - Get block information
 - `chunk` - Get chunk information
 - `gas_price` - Get current gas price
@@ -175,16 +176,19 @@ let stableMethods = RpcMethodValidator.stableMethods()
 - `client_config` - Client configuration
 
 ### Transaction Methods (4)
+
 - `broadcast_tx_async` - Broadcast transaction asynchronously
 - `broadcast_tx_commit` - Broadcast transaction and wait for commit
 - `send_tx` - Send transaction
 - `tx` - Get transaction status
 
 ### Query Methods (2)
+
 - `query` - Query account/contract state
 - `light_client_proof` - Light client execution proof
 
 ### Experimental Methods (25)
+
 All prefixed with `EXPERIMENTAL_` for advanced features.
 
 ## Examples
@@ -211,7 +215,7 @@ func retryRequest<T>(
     operation: @escaping () async throws -> T
 ) async throws -> T {
     var lastError: Error?
-    
+
     for attempt in 1...maxRetries {
         do {
             return try await operation()
@@ -222,7 +226,7 @@ func retryRequest<T>(
             }
         }
     }
-    
+
     throw lastError ?? NSError(domain: "RetryError", code: -1, userInfo: [NSLocalizedDescriptionKey: "All retry attempts failed"])
 }
 ```

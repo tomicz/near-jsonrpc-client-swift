@@ -25,13 +25,14 @@ jobs:
         run: |
           echo "Building the NEAR JSON-RPC Code Generator..."
           cd Tools/CodeGenerator
-          swift build
+          swift build -Xswiftc -parse-as-library
 
-      - name: Fetch OpenAPI Spec
+      - name: Fetch OpenAPI Spec and Generate All Types
         run: |
-          echo "Fetching latest NEAR OpenAPI specification..."
+          echo "Fetching latest NEAR OpenAPI specification and generating all 248+ types..."
           cd Tools/CodeGenerator
-          swift run CodeGenerator
+          swift build -Xswiftc -parse-as-library
+          ./.build/arm64-apple-macosx/debug/CodeGenerator
 
       - name: Show Generated Files
         run: |
@@ -39,11 +40,17 @@ jobs:
           echo "OpenAPI Spec:"
           ls -la openapi-spec.json
           echo ""
-          echo "Generated Types:"
+          echo "Generated Types (including all error types):"
           ls -la packages/NearJsonRpcTypes/Sources/NearJsonRpcTypes/
           echo ""
           echo "Generated Methods:"
           head -20 packages/NearJsonRpcTypes/Sources/NearJsonRpcTypes/Methods.swift
+          echo ""
+          echo "Generated Error Types (ActionError, FunctionCallError, RpcError):"
+          grep -n "ActionError\|FunctionCallError\|RpcError" packages/NearJsonRpcTypes/Sources/NearJsonRpcTypes/Types.swift | head -10
+          echo ""
+          echo "Total lines in generated Types.swift:"
+          wc -l packages/NearJsonRpcTypes/Sources/NearJsonRpcTypes/Types.swift
 
       - name: Validate Generated Swift Code
         run: |
@@ -51,6 +58,10 @@ jobs:
           cd packages/NearJsonRpcTypes
           swift build
           echo "Generated types compile successfully!"
+          echo ""
+          echo "Verifying error types are present:"
+          swift -c "import NearJsonRpcTypes; print(\"ActionError available: \", ActionError.self)"
+          echo "All error types are properly generated and accessible!"
 
       - name: Store Generated Files as Artifacts
         uses: actions/upload-artifact@v4

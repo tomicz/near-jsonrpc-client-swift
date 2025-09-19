@@ -249,11 +249,11 @@ public struct RpcQueryResponse: Codable, Sendable {
 // AnyCodable - allows encoding/decoding of any JSON value
 public struct AnyCodable: Codable {
     public let value: Any
-    
+
     public init(_ value: Any)
     public init(from decoder: Decoder) throws
     public func encode(to encoder: Encoder) throws
-    
+
     // Extension for type conversion
     public func decode<T: Codable>(_ type: T.Type) throws -> T
 }
@@ -261,7 +261,7 @@ public struct AnyCodable: Codable {
 // Sendable wrapper for JSON data
 public struct JsonData: @unchecked Sendable {
     public let value: [String: Any]
-    
+
     public init(_ value: [String: Any])
 }
 ```
@@ -274,19 +274,19 @@ public struct JsonData: @unchecked Sendable {
 public struct RpcMethodValidator {
     // Check if a method is valid
     public static func isValid(_ method: String) -> Bool
-    
+
     // Get the path for a given method
     public static func path(for method: String) -> String?
-    
+
     // Get the method for a given path
     public static func method(for path: String) -> String?
-    
+
     // Get all available methods
     public static func allMethods() -> [String]
-    
+
     // Get all experimental methods
     public static func experimentalMethods() -> [String]
-    
+
     // Get all stable methods
     public static func stableMethods() -> [String]
 }
@@ -322,13 +322,13 @@ public enum CommonRpcMethods {
     public static let health = "health"
     public static let genesisConfig = "genesis_config"
     public static let clientConfig = "client_config"
-    
+
     // Transaction methods
     public static let broadcastTxAsync = "broadcast_tx_async"
     public static let broadcastTxCommit = "broadcast_tx_commit"
     public static let sendTx = "send_tx"
     public static let tx = "tx"
-    
+
     // Experimental methods
     public static let EXPERIMENTALChanges = "EXPERIMENTAL_changes"
     public static let EXPERIMENTALChangesInBlock = "EXPERIMENTAL_changes_in_block"
@@ -422,6 +422,7 @@ let nearError = NearRpcError.fromRpcError(rpcError)
 ## Supported RPC Methods
 
 ### Core Methods (8)
+
 - `block` - Get block information
 - `chunk` - Get chunk information
 - `gas_price` - Get current gas price
@@ -432,16 +433,19 @@ let nearError = NearRpcError.fromRpcError(rpcError)
 - `client_config` - Client configuration
 
 ### Transaction Methods (4)
+
 - `broadcast_tx_async` - Broadcast transaction asynchronously
 - `broadcast_tx_commit` - Broadcast transaction and wait for commit
 - `send_tx` - Send transaction
 - `tx` - Get transaction status
 
 ### Query Methods (2)
+
 - `query` - Query account/contract state
 - `light_client_proof` - Light client execution proof
 
 ### Experimental Methods (25)
+
 All prefixed with `EXPERIMENTAL_` for advanced features.
 
 ## Type Safety Features

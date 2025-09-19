@@ -9,9 +9,11 @@ The NEAR JSON-RPC Swift client is a production-ready, type-safe Swift library fo
 ## Documentation Structure
 
 ### 📚 [API Reference](api-reference.md)
+
 Complete API reference covering all client methods, types, and RPC operations.
 
 **Key Sections:**
+
 - NearJsonRpcClient initialization and methods
 - Typed methods for common operations
 - NearJsonRpcTypes comprehensive type definitions
@@ -20,9 +22,11 @@ Complete API reference covering all client methods, types, and RPC operations.
 - Usage examples and patterns
 
 ### 🚀 [Client Documentation](client/README.md)
+
 Detailed client usage guide with installation, features, and best practices.
 
 **Key Features:**
+
 - Type safety with auto-generated types
 - Async/await support
 - Comprehensive error handling
@@ -31,9 +35,11 @@ Detailed client usage guide with installation, features, and best practices.
 - Production-ready patterns
 
 ### 📖 [Examples Documentation](examples/README.md)
+
 Comprehensive examples covering all major use cases and production patterns.
 
 **8 Example Packages:**
+
 - **basic-usage**: Enhanced basic operations (7 examples)
 - **advanced-usage**: Real-world scenarios and complex operations
 - **transaction-examples**: Complete transaction lifecycle management
@@ -44,9 +50,11 @@ Comprehensive examples covering all major use cases and production patterns.
 - **types-usage**: Type-safe operations with generated types
 
 ### 🔧 [Types Documentation](types/README.md)
+
 Complete type system documentation with all generated types and validation.
 
 **Type Categories:**
+
 - JSON-RPC protocol types
 - NEAR Protocol core types
 - Account and access key types
@@ -93,24 +101,28 @@ let accountView = try await viewAccount(client, accountId: "example.testnet")
 ## Key Features
 
 ### 🛡️ Type Safety
+
 - **Auto-generated types** from NEAR's OpenAPI specification
 - **Compile-time validation** for all RPC methods and parameters
 - **400+ type definitions** covering all NEAR Protocol operations
 - **Sendable support** for Swift concurrency
 
 ### 🚀 Performance
+
 - **Async/await** support for modern Swift concurrency
 - **Efficient JSON parsing** with type-safe decoding
 - **Minimal overhead** with optimized type system
 - **Cross-platform** support (macOS, iOS, watchOS, tvOS)
 
 ### 🔧 Production Ready
+
 - **Comprehensive error handling** with custom error types
 - **Method validation** for all 39 RPC methods
 - **Retry patterns** and graceful degradation
 - **Real-world examples** tested against live NEAR testnet
 
 ### 📊 Comprehensive Coverage
+
 - **39 RPC methods** including 8 core, 4 transaction, 2 query, and 25 experimental
 - **Complete type system** for all NEAR Protocol operations
 - **Method validation** with built-in validation utilities
@@ -126,6 +138,7 @@ let accountView = try await viewAccount(client, accountId: "example.testnet")
 ## Supported RPC Methods
 
 ### Core Methods (8)
+
 - `block` - Get block information
 - `chunk` - Get chunk information
 - `gas_price` - Get current gas price
@@ -136,16 +149,19 @@ let accountView = try await viewAccount(client, accountId: "example.testnet")
 - `client_config` - Client configuration
 
 ### Transaction Methods (4)
+
 - `broadcast_tx_async` - Broadcast transaction asynchronously
 - `broadcast_tx_commit` - Broadcast transaction and wait for commit
 - `send_tx` - Send transaction
 - `tx` - Get transaction status
 
 ### Query Methods (2)
+
 - `query` - Query account/contract state
 - `light_client_proof` - Light client execution proof
 
 ### Experimental Methods (25)
+
 All prefixed with `EXPERIMENTAL_` for advanced features.
 
 ## Examples
@@ -288,7 +304,7 @@ func retryRequest<T>(
     operation: @escaping () async throws -> T
 ) async throws -> T {
     var lastError: Error?
-    
+
     for attempt in 1...maxRetries {
         do {
             return try await operation()
@@ -299,7 +315,7 @@ func retryRequest<T>(
             }
         }
     }
-    
+
     throw lastError ?? NSError(domain: "RetryError", code: -1, userInfo: [NSLocalizedDescriptionKey: "All retry attempts failed"])
 }
 ```
@@ -315,7 +331,7 @@ import NearJsonRpcClient
 struct ContentView: View {
     @State private var blockHeight: Int = 0
     @State private var isLoading = false
-    
+
     var body: some View {
         VStack {
             if isLoading {
@@ -328,11 +344,11 @@ struct ContentView: View {
             await loadBlockHeight()
         }
     }
-    
+
     private func loadBlockHeight() async {
         isLoading = true
         defer { isLoading = false }
-        
+
         do {
             let client = try NearJsonRpcClient(urlString: "https://rpc.testnet.near.org")
             let response = try await client.request(method: "block", params: ["finality": "final"])
@@ -353,12 +369,12 @@ import NearJsonRpcClient
 class NearService: ObservableObject {
     @Published var blockHeight: Int = 0
     @Published var isLoading = false
-    
+
     private var cancellables = Set<AnyCancellable>()
-    
+
     func loadBlockHeight() {
         isLoading = true
-        
+
         Task {
             do {
                 let client = try NearJsonRpcClient(urlString: "https://rpc.testnet.near.org")

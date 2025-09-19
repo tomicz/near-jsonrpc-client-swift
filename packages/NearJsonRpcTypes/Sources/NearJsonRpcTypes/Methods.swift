@@ -1,42 +1,42 @@
 // Auto-generated method mapping from NEAR OpenAPI spec
-// Generated on: 2025-09-15 13:04:29 +0000
+// Generated on: 2025-09-19 06:57:46 +0000
 // Do not edit manually - run 'swift package generate' to regenerate
 
 import Foundation
 
 /// Maps OpenAPI paths to actual JSON-RPC method names
 public let pathToMethodMap: [String: String] = [
-    "/network_info": "network_info",
-    "/broadcast_tx_async": "broadcast_tx_async",
-    "/gas_price": "gas_price",
-    "/client_config": "client_config",
-    "/maintenance_windows": "maintenance_windows",
-    "/changes": "changes",
-    "/EXPERIMENTAL_validators_ordered": "EXPERIMENTAL_validators_ordered",
-    "/EXPERIMENTAL_tx_status": "EXPERIMENTAL_tx_status",
-    "/EXPERIMENTAL_light_client_proof": "EXPERIMENTAL_light_client_proof",
-    "/query": "query",
-    "/status": "status",
-    "/genesis_config": "genesis_config",
-    "/broadcast_tx_commit": "broadcast_tx_commit",
-    "/send_tx": "send_tx",
-    "/EXPERIMENTAL_changes": "EXPERIMENTAL_changes",
-    "/chunk": "chunk",
-    "/tx": "tx",
-    "/EXPERIMENTAL_protocol_config": "EXPERIMENTAL_protocol_config",
-    "/EXPERIMENTAL_genesis_config": "EXPERIMENTAL_genesis_config",
-    "/block": "block",
-    "/EXPERIMENTAL_light_client_block_proof": "EXPERIMENTAL_light_client_block_proof",
-    "/validators": "validators",
-    "/EXPERIMENTAL_changes_in_block": "EXPERIMENTAL_changes_in_block",
-    "/next_light_client_block": "next_light_client_block",
-    "/EXPERIMENTAL_receipt": "EXPERIMENTAL_receipt",
     "/light_client_proof": "light_client_proof",
-    "/EXPERIMENTAL_maintenance_windows": "EXPERIMENTAL_maintenance_windows",
-    "/EXPERIMENTAL_congestion_level": "EXPERIMENTAL_congestion_level",
+    "/gas_price": "gas_price",
+    "/EXPERIMENTAL_changes_in_block": "EXPERIMENTAL_changes_in_block",
+    "/EXPERIMENTAL_validators_ordered": "EXPERIMENTAL_validators_ordered",
+    "/EXPERIMENTAL_light_client_proof": "EXPERIMENTAL_light_client_proof",
+    "/send_tx": "send_tx",
+    "/EXPERIMENTAL_protocol_config": "EXPERIMENTAL_protocol_config",
+    "/tx": "tx",
+    "/EXPERIMENTAL_tx_status": "EXPERIMENTAL_tx_status",
+    "/EXPERIMENTAL_genesis_config": "EXPERIMENTAL_genesis_config",
     "/health": "health",
+    "/client_config": "client_config",
+    "/next_light_client_block": "next_light_client_block",
+    "/network_info": "network_info",
+    "/query": "query",
+    "/genesis_config": "genesis_config",
+    "/changes": "changes",
+    "/status": "status",
+    "/block_effects": "block_effects",
+    "/EXPERIMENTAL_congestion_level": "EXPERIMENTAL_congestion_level",
+    "/block": "block",
+    "/EXPERIMENTAL_receipt": "EXPERIMENTAL_receipt",
+    "/EXPERIMENTAL_light_client_block_proof": "EXPERIMENTAL_light_client_block_proof",
+    "/maintenance_windows": "maintenance_windows",
+    "/validators": "validators",
+    "/broadcast_tx_commit": "broadcast_tx_commit",
+    "/broadcast_tx_async": "broadcast_tx_async",
+    "/EXPERIMENTAL_changes": "EXPERIMENTAL_changes",
+    "/EXPERIMENTAL_maintenance_windows": "EXPERIMENTAL_maintenance_windows",
     "/EXPERIMENTAL_split_storage_info": "EXPERIMENTAL_split_storage_info",
-    "/block_effects": "block_effects"
+    "/chunk": "chunk"
 ]
 
 /// Reverse mapping for convenience
