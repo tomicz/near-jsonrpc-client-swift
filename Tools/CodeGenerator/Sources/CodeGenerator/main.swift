@@ -90,7 +90,7 @@ struct CodeGenerator {
             .deletingLastPathComponent() // Remove Sources/
             .deletingLastPathComponent() // Remove CodeGenerator/
             .deletingLastPathComponent() // Remove Tools/
-            .appendingPathComponent("near-jsonrpc-client-swift")
+            
         
         let specPath = projectRoot.appendingPathComponent("openapi-spec.json")
         try data.write(to: specPath)
@@ -238,7 +238,7 @@ struct CodeGenerator {
             .deletingLastPathComponent() // Remove Sources/
             .deletingLastPathComponent() // Remove CodeGenerator/
             .deletingLastPathComponent() // Remove Tools/
-            .appendingPathComponent("near-jsonrpc-client-swift")
+            
         
         print("   📁 Project root: \(projectRoot.path)")
         
@@ -290,7 +290,7 @@ struct CodeGenerator {
             .deletingLastPathComponent() // Remove Sources/
             .deletingLastPathComponent() // Remove CodeGenerator/
             .deletingLastPathComponent() // Remove Tools/
-            .appendingPathComponent("near-jsonrpc-client-swift")
+            
         
         let typesFile = projectRoot
             .appendingPathComponent("packages")
