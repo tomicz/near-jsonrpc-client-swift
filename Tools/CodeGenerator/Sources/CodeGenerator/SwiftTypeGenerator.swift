@@ -6,6 +6,9 @@ struct SwiftTypeGenerator {
     func generateTypes(_ typeDefinitions: [SwiftTypeDefinition]) -> String {
         var output = generateFileHeader()
         
+        // Generate AnyCodable type first
+        output += generateAnyCodable()
+        
         // Generate basic JSON-RPC types first
         output += generateBasicJsonRpcTypes()
         
@@ -36,6 +39,67 @@ struct SwiftTypeGenerator {
         // MARK: - JSON-RPC Protocol Types
 
         """
+    }
+    
+    private func generateAnyCodable() -> String {
+        return """
+// MARK: - AnyCodable
+/// A type-erased wrapper for any Codable value
+public struct AnyCodable: Codable {
+    public let value: Any
+    
+    public init<T>(_ value: T?) {
+        self.value = value ?? ()
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        
+        if container.decodeNil() {
+            self.init(())
+        } else if let bool = try? container.decode(Bool.self) {
+            self.init(bool)
+        } else if let int = try? container.decode(Int.self) {
+            self.init(int)
+        } else if let double = try? container.decode(Double.self) {
+            self.init(double)
+        } else if let string = try? container.decode(String.self) {
+            self.init(string)
+        } else if let array = try? container.decode([AnyCodable].self) {
+            self.init(array.map { $0.value })
+        } else if let dictionary = try? container.decode([String: AnyCodable].self) {
+            self.init(dictionary.mapValues { $0.value })
+        } else {
+            throw DecodingError.dataCorruptedError(in: container, debugDescription: "AnyCodable value cannot be decoded")
+        }
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        
+        switch value {
+        case is Void:
+            try container.encodeNil()
+        case let bool as Bool:
+            try container.encode(bool)
+        case let int as Int:
+            try container.encode(int)
+        case let double as Double:
+            try container.encode(double)
+        case let string as String:
+            try container.encode(string)
+        case let array as [Any?]:
+            try container.encode(array.map { AnyCodable($0) })
+        case let dictionary as [String: Any?]:
+            try container.encode(dictionary.mapValues { AnyCodable($0) })
+        default:
+            let context = EncodingError.Context(codingPath: container.codingPath, debugDescription: "AnyCodable value cannot be encoded")
+            throw EncodingError.invalidValue(value, context)
+        }
+    }
+}
+
+"""
     }
     
     private func generateBasicJsonRpcTypes() -> String {
@@ -194,79 +258,17 @@ struct SwiftTypeGenerator {
     private func generateEnum(name: String, cases: [SwiftEnumCase], isPublic: Bool) -> String {
         let visibility = isPublic ? "public" : "internal"
         
-        var output = "\(visibility) enum \(name): Codable, Sendable {\n"
+        var output = "\(visibility) enum \(name): String, Codable, Sendable, CaseIterable {\n"
         
-        // Generate cases
+        // Generate cases - simplified to string enums for now
         for case_ in cases {
-            if let associatedValue = case_.associatedValue {
-                output += "    case \(case_.name)(\(associatedValue))\n"
-            } else {
-                output += "    case \(case_.name)\n"
-            }
-        }
-        
-        // Generate custom Codable implementation for complex enums
-        if cases.contains(where: { $0.associatedValue != nil }) {
-            output += generateEnumCodableImplementation(name: name, cases: cases)
+            output += "    case \(case_.name) = \"\(case_.name)\"\n"
         }
         
         output += "}\n"
         return output
     }
     
-    private func generateEnumCodableImplementation(name: String, cases: [SwiftEnumCase]) -> String {
-        var output = "\n    \(name == "ActionErrorKind" || name == "FunctionCallError" ? "public" : "internal") init(from decoder: Decoder) throws {\n"
-        output += "        let container = try decoder.singleValueContainer()\n"
-        output += "        if let dict = try? container.decode([String: AnyCodable].self) {\n"
-        
-        for case_ in cases {
-            if let associatedValue = case_.associatedValue {
-                output += "            if let \(case_.name.lowercased()) = dict[\"\(case_.name)\"] {\n"
-                output += "                self = .\(case_.name)(try \(case_.name.lowercased()).decode(\(associatedValue).self))\n"
-                output += "            } else "
-            }
-        }
-        
-        output += "{\n"
-        output += "                throw DecodingError.dataCorruptedError(in: container, debugDescription: \"Invalid \(name)\")\n"
-        output += "            }\n"
-        output += "        } else if let stringValue = try? container.decode(String.self) {\n"
-        
-        // Handle string enum cases
-        let stringCases = cases.filter { $0.associatedValue == nil }
-        if !stringCases.isEmpty {
-            output += "            switch stringValue {\n"
-            for case_ in stringCases {
-                output += "            case \"\(case_.name)\": self = .\(case_.name)\n"
-            }
-            output += "            default: throw DecodingError.dataCorruptedError(in: container, debugDescription: \"Invalid \(name): \\(stringValue)\")\n"
-            output += "            }\n"
-        }
-        
-        output += "        } else {\n"
-        output += "            throw DecodingError.dataCorruptedError(in: container, debugDescription: \"Invalid \(name)\")\n"
-        output += "        }\n"
-        output += "    }\n"
-        
-        output += "\n    func encode(to encoder: Encoder) throws {\n"
-        output += "        var container = encoder.singleValueContainer()\n"
-        output += "        switch self {\n"
-        
-        for case_ in cases {
-            if case_.associatedValue != nil {
-                output += "        case .\(case_.name)(let value):\n"
-                output += "            try container.encode([\"\(case_.name)\": AnyCodable(value)])\n"
-            } else {
-                output += "        case .\(case_.name):\n"
-                output += "            try container.encode(\"\(case_.name)\")\n"
-            }
-        }
-        
-        output += "        }\n"
-        output += "    }\n"
-        
-        return output
-    }
     
     private func generateTypealias(name: String, type: String, isPublic: Bool) -> String {
         let visibility = isPublic ? "public" : "internal"
