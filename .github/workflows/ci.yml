@@ -7,15 +7,173 @@ on:
     branches: [main]
 
 jobs:
-  test:
-    name: Test & Build
+  # Code Generation Testing - Show the generator in action
+  code_generation:
+    name: Code Generation Demo
     runs-on: macos-14
 
     steps:
-      - name: Checkout
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Select Xcode version
+      - name: Setup Swift Environment
+        uses: swift-actions/setup-swift@v1
+        with:
+          swift-version: "5.9"
+
+      - name: Build Code Generator
+        run: |
+          echo "Building the NEAR JSON-RPC Code Generator..."
+          cd Tools/CodeGenerator
+          swift build
+
+      - name: Fetch OpenAPI Spec
+        run: |
+          echo "Fetching latest NEAR OpenAPI specification..."
+          cd Tools/CodeGenerator
+          swift run CodeGenerator
+
+      - name: Show Generated Files
+        run: |
+          echo "=== Generated Files ==="
+          echo "OpenAPI Spec:"
+          ls -la openapi-spec.json
+          echo ""
+          echo "Generated Types:"
+          ls -la packages/NearJsonRpcTypes/Sources/NearJsonRpcTypes/
+          echo ""
+          echo "Generated Methods:"
+          head -20 packages/NearJsonRpcTypes/Sources/NearJsonRpcTypes/Methods.swift
+
+      - name: Validate Generated Swift Code
+        run: |
+          echo "Validating generated Swift code compiles..."
+          cd packages/NearJsonRpcTypes
+          swift build
+          echo "Generated types compile successfully!"
+
+      - name: Store Generated Files as Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-types-${{ github.run_number }}
+          path: |
+            packages/NearJsonRpcTypes/Sources/NearJsonRpcTypes/
+            openapi-spec.json
+          retention-days: 30
+
+  # Generated Types Validation - Test the generated code
+  validate_generated_types:
+    name: Validate Generated Types
+    runs-on: macos-14
+    needs: code_generation
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Swift Environment
+        uses: swift-actions/setup-swift@v1
+        with:
+          swift-version: "5.9"
+
+      - name: Download Generated Types
+        uses: actions/download-artifact@v4
+        with:
+          name: generated-types-${{ github.run_number }}
+          path: .
+
+      - name: Build with Generated Types
+        run: |
+          echo "Building packages with generated types..."
+          cd packages/NearJsonRpcTypes
+          swift build
+          echo "Generated types build successfully!"
+
+      - name: Test Generated Types
+        run: |
+          echo "Running tests on generated types..."
+          cd packages/NearJsonRpcTypes
+          swift test
+          echo "All generated type tests pass!"
+
+      - name: Show Type Coverage
+        run: |
+          echo "=== Generated Type Coverage ==="
+          echo "Total type definitions:"
+          grep -c "public struct\|public enum\|public typealias" packages/NearJsonRpcTypes/Sources/NearJsonRpcTypes/Types.swift || echo "0"
+          echo ""
+          echo "RPC Methods:"
+          grep -c "public static let" packages/NearJsonRpcTypes/Sources/NearJsonRpcTypes/Methods.swift || echo "0"
+          echo ""
+          echo "Method Mappings:"
+          grep -c "\":" packages/NearJsonRpcTypes/Sources/NearJsonRpcTypes/Methods.swift || echo "0"
+
+  # Integration Testing - Test everything works together
+  integration_tests:
+    name: Integration Tests
+    runs-on: macos-14
+    needs: [code_generation, validate_generated_types]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Swift Environment
+        uses: swift-actions/setup-swift@v1
+        with:
+          swift-version: "5.9"
+
+      - name: Download Generated Types
+        uses: actions/download-artifact@v4
+        with:
+          name: generated-types-${{ github.run_number }}
+          path: .
+
+      - name: Build All Packages
+        run: |
+          echo "Building all packages with generated types..."
+          cd packages/NearJsonRpcTypes && swift build
+          cd ../NearJsonRpcClient && swift build
+          echo "All packages build successfully!"
+
+      - name: Run All Tests
+        run: |
+          echo "Running comprehensive test suite..."
+          cd packages/NearJsonRpcTypes && swift test
+          cd ../NearJsonRpcClient && swift test
+          echo "All tests pass!"
+
+      - name: Build Examples
+        run: |
+          echo "Building examples with generated types..."
+          cd examples/basic-usage && swift build
+          cd ../advanced-usage && swift build
+          cd ../types-usage && swift build
+          cd ../typed-usage && swift build
+          cd ../validation-examples && swift build
+          echo "All examples build successfully!"
+
+      - name: Show Integration Summary
+        run: |
+          echo "=== Integration Test Summary ==="
+          echo "Code generation: Working"
+          echo "Type validation: Working"
+          echo "Package building: Working"
+          echo "Test execution: Working"
+          echo "Example building: Working"
+          echo ""
+          echo "All systems operational!"
+
+  # Original Test Suite - Keep existing functionality
+  test:
+    name: Original Test Suite
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Select Xcode Version
         run: sudo xcode-select -s /Applications/Xcode_15.4.app
 
       - name: Clean Derived Data
@@ -26,7 +184,7 @@ jobs:
         with:
           swift-version: "5.9"
 
-      - name: Cache dependencies
+      - name: Cache Dependencies
         uses: actions/cache@v3
         with:
           path: .build
@@ -34,23 +192,23 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-spm-
 
-      - name: Resolve dependencies
+      - name: Resolve Dependencies
         run: |
           cd packages/NearJsonRpcTypes && swift package resolve
           cd ../NearJsonRpcClient && swift package resolve
 
-      - name: Test packages
+      - name: Test Packages
         run: |
           cd packages/NearJsonRpcTypes && swift test
           cd ../NearJsonRpcClient && swift test
 
-      - name: Build examples
+      - name: Build Examples
         run: |
           cd examples/basic-usage && swift build
           cd ../advanced-usage && swift build
           cd ../types-usage && swift build
 
-      - name: Build packages
+      - name: Build Packages
         run: |
           cd packages/NearJsonRpcTypes && swift build
           cd ../NearJsonRpcClient && swift build
