@@ -17,9 +17,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Swift Environment
-        uses: swift-actions/setup-swift@v1
+        uses: swift-actions/setup-swift@v2
         with:
-          swift-version: "6.0"
+          swift-version: "5.9"
 
       - name: Build Code Generator
         run: |
@@ -83,9 +83,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Swift Environment
-        uses: swift-actions/setup-swift@v1
+        uses: swift-actions/setup-swift@v2
         with:
-          swift-version: "6.0"
+          swift-version: "5.9"
 
       - name: Download Generated Types
         uses: actions/download-artifact@v4
@@ -130,9 +130,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Swift Environment
-        uses: swift-actions/setup-swift@v1
+        uses: swift-actions/setup-swift@v2
         with:
-          swift-version: "6.0"
+          swift-version: "5.9"
 
       - name: Download Generated Types
         uses: actions/download-artifact@v4
@@ -191,9 +191,9 @@ jobs:
         run: rm -rf ~/Library/Developer/Xcode/DerivedData
 
       - name: Setup Swift
-        uses: swift-actions/setup-swift@v1
+        uses: swift-actions/setup-swift@v2
         with:
-          swift-version: "6.0"
+          swift-version: "5.9"
 
       - name: Cache Dependencies
         uses: actions/cache@v3
