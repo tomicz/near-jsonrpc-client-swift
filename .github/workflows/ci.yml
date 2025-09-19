@@ -19,7 +19,7 @@ jobs:
       - name: Setup Swift Environment
         uses: swift-actions/setup-swift@v1
         with:
-          swift-version: "5.9"
+          swift-version: "6.0"
 
       - name: Build Code Generator
         run: |
@@ -85,7 +85,7 @@ jobs:
       - name: Setup Swift Environment
         uses: swift-actions/setup-swift@v1
         with:
-          swift-version: "5.9"
+          swift-version: "6.0"
 
       - name: Download Generated Types
         uses: actions/download-artifact@v4
@@ -132,7 +132,7 @@ jobs:
       - name: Setup Swift Environment
         uses: swift-actions/setup-swift@v1
         with:
-          swift-version: "5.9"
+          swift-version: "6.0"
 
       - name: Download Generated Types
         uses: actions/download-artifact@v4
@@ -193,7 +193,7 @@ jobs:
       - name: Setup Swift
         uses: swift-actions/setup-swift@v1
         with:
-          swift-version: "5.9"
+          swift-version: "6.0"
 
       - name: Cache Dependencies
         uses: actions/cache@v3
