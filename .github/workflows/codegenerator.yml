@@ -23,7 +23,7 @@ jobs:
         run: cd Tools/CodeGenerator
 
       - name: Build and run Swift Package
-        working-directory: CodeGenerator
+        working-directory: Tools/CodeGenerator
         run: swift run
 
       - name: Upload OpenAPI JSON file
