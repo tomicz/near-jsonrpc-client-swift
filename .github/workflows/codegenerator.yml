@@ -1,0 +1,27 @@
+name: Generate swift types from an open api spec
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  download:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install Swift
+        uses: fwal/setup-swift@v2
+        with:
+          swift-version: "5.9"
+
+      - name: Navigate to CodeGenerator
+        run: cd CodeGenerator
+
+      - name: Build and run Swift Package
+        working-directory: CodeGenerator
+        run: swift run
