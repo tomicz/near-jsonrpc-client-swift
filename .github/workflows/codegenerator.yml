@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  download:
+  download-openapi-spec:
     runs-on: macos-latest
 
     steps:
