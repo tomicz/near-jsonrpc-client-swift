@@ -28,6 +28,7 @@ let task = URLSession.shared.downloadTask(with: url) {tempURL, response, error i
         }
         try FileManager.default.moveItem(at: tempURL, to: destination)
         print("File saved to destination \(destination.path)") 
+        validateOpenApiSpec(at: destination)
     }
     catch{
         print("File error \(error)")
@@ -39,3 +40,31 @@ let task = URLSession.shared.downloadTask(with: url) {tempURL, response, error i
 
  task.resume()
  RunLoop.main.run()
+
+func validateOpenApiSpec(at url: URL){
+    do{
+        let data = try Data(contentsOf: url)
+        let json = try JSONSerialization.jsonObject(with: data, options: [])
+
+        // check open api version
+        guard let json = json as? [String: Any],
+              let openapi = json["openapi"] as? String,
+              openapi == "3.0.0" else{
+
+            print("Invalid open api version")
+            exit(1)
+        }
+        
+        print("Open api version is \(openapi)")
+
+        if let info = json["info"] as? [String: Any]{
+            for (key, value) in info {
+                print("\(key): \(value)")
+            }
+        }
+    }
+    catch{
+        print("Error validating open api spec \(error)")
+        exit(1)
+    }
+}
