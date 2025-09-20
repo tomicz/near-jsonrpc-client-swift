@@ -25,3 +25,9 @@ jobs:
       - name: Build and run Swift Package
         working-directory: CodeGenerator
         run: swift run
+
+      - name: Upload OpenAPI JSON file
+        uses: actions/upload-artifact@v3
+        with:
+          name: openapi-json
+          path: open-api-near-spec.json
