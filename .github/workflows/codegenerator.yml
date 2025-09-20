@@ -30,4 +30,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: openapi-json
-          path: open-api-near-spec.json
+          path: CodeGenerator/open-api-near-spec.json
