@@ -59,23 +59,23 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          
+
           # Fetch latest changes first
           git fetch origin
-          
+
           # Reset to origin/main to avoid conflicts
           git reset --hard origin/main
-          
+
           # Regenerate types on clean state
           cd Tools/CodeGenerator
           swift run
           cd ../..
-          
+
           # Test compilation
           cd packages/NearJsonRpcTypes
           swift build
           cd ../..
-          
+
           # Commit and push
           git add .
           git commit -m "feat: update generated Swift types from OpenAPI spec
@@ -85,5 +85,5 @@ jobs:
           - Updated type definitions and enums
           - All 249 types generated correctly
           - No compilation errors detected"
-          
+
           git push
