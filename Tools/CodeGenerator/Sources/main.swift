@@ -124,9 +124,13 @@ func generateSwiftType(name: String, schema: [String: Any]) -> String {
         return generateTypeAlias(name: name, description: description, schema: schema)
     }
     
-    // Check if it's a union type (oneOf)
+    // Check if it's a union type (oneOf or anyOf)
     if let oneOf = schema["oneOf"] as? [[String: Any]] {
         return generateEnum(name: name, description: description, oneOf: oneOf)
+    }
+    
+    if let anyOf = schema["anyOf"] as? [[String: Any]] {
+        return generateEnum(name: name, description: description, oneOf: anyOf)
     }
     
     // Check if it's an empty schema (no properties)
@@ -186,13 +190,24 @@ func generateEnum(name: String, description: String?, oneOf: [[String: Any]]) ->
     var caseNames = Set<String>()
     var caseIndex = 0
     
-    // Generate cases
+    // Generate cases for union types
     for (index, caseDef) in oneOf.enumerated() {
-        if let properties = caseDef["properties"] as? [String: Any] {
-            for (caseName, caseDef) in properties {
-                let swiftType = mapOpenAPITypeToSwift(caseDef as? [String: Any] ?? [:])
-                let finalCaseName = generateUniqueCaseName(caseName.lowercased(), existingNames: &caseNames)
-                code += "    case \(finalCaseName)(\(swiftType))\n"
+        if let properties = caseDef["properties"] as? [String: Any], !properties.isEmpty {
+            // This is a struct-like case with properties
+            let caseName = caseDef["title"] as? String ?? "case\(caseIndex)"
+            let finalCaseName = generateUniqueCaseName(caseName.lowercased().replacingOccurrences(of: "_", with: ""), existingNames: &caseNames)
+            
+            // Generate associated values for the properties
+            var associatedValues: [String] = []
+            for (propName, propDef) in properties {
+                let swiftType = mapOpenAPITypeToSwift(propDef as? [String: Any] ?? [:])
+                associatedValues.append("\(propName): \(swiftType)")
+            }
+            
+            if associatedValues.isEmpty {
+                code += "    case \(finalCaseName)\n"
+            } else {
+                code += "    case \(finalCaseName)(\(associatedValues.joined(separator: ", ")))\n"
             }
         } else if let enumValues = caseDef["enum"] as? [String] {
             for enumValue in enumValues {
@@ -309,24 +324,13 @@ func isEmptySchema(schema: [String: Any]) -> Bool {
         return false
     }
     
-    if let anyOf = schema["anyOf"] as? [[String: Any]] {
-        // Check if anyOf has any meaningful content
-        for option in anyOf {
-            if let optionProperties = option["properties"] as? [String: Any], !optionProperties.isEmpty {
-                return false
-            }
-        }
-        return true
+    // If it has anyOf or oneOf, it's not empty - it's a union type
+    if let anyOf = schema["anyOf"] as? [[String: Any]], !anyOf.isEmpty {
+        return false
     }
     
-    if let oneOf = schema["oneOf"] as? [[String: Any]] {
-        // Check if oneOf has any meaningful content
-        for option in oneOf {
-            if let optionProperties = option["properties"] as? [String: Any], !optionProperties.isEmpty {
-                return false
-            }
-        }
-        return true
+    if let oneOf = schema["oneOf"] as? [[String: Any]], !oneOf.isEmpty {
+        return false
     }
     
     return schema["properties"] == nil
