@@ -62,9 +62,23 @@ func validateOpenApiSpec(at url: URL){
                 print("\(key): \(value)")
             }
         }
+        extractSchemas(from: json)
     }
     catch{
         print("Error validating open api spec \(error)")
         exit(1)
+    }
+}
+
+func extractSchemas(from json: [String: Any]){
+    print("Startingto extract types")
+    
+    if let components = json["components"] as? [String: Any],
+    let schemas = components["schemas"] as? [String: Any] {
+        for (schemaName, _) in schemas {
+            print(schemaName)
+        }
+
+        print("Types count: \(schemas.count)")
     }
 }
