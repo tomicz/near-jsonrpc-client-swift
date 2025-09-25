@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  download-openapi-spec:
+  generate-swift-types:
     runs-on: macos-latest
 
     steps:
@@ -17,7 +17,7 @@ jobs:
       - name: Install Swift
         uses: fwal/setup-swift@v2
         with:
-          swift-version: '6.0'
+          swift-version: "6.0"
 
       - name: Navigate to CodeGenerator
         run: cd Tools/CodeGenerator
@@ -25,6 +25,12 @@ jobs:
       - name: Build and run Swift Package
         working-directory: Tools/CodeGenerator
         run: swift run
+
+      - name: Test generated types compilation
+        run: |
+          cd packages/NearJsonRpcTypes
+          swift build
+          echo "Generated types compile successfully"
 
       - name: Upload OpenAPI JSON file
         uses: actions/upload-artifact@v4
