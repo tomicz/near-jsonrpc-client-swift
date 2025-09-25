@@ -67,7 +67,7 @@ jobs:
           - Updated type definitions and enums
           - All 249 types generated correctly
           - No compilation errors detected"
-          
+
           # Fetch latest changes and rebase to avoid conflicts
           git fetch origin
           git rebase origin/main
