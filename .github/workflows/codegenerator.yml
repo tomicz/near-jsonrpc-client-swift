@@ -11,7 +11,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
   update-generated-code:
@@ -55,31 +54,17 @@ jobs:
             echo "changed=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: Create Pull Request
+      - name: Commit and push changes
         if: steps.changes.outputs.changed == 'true'
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "feat: update generated Swift types from OpenAPI spec"
-          committer: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
-          author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
-          title: "feat: update generated Swift types from OpenAPI spec"
-          body: |
-            This PR contains auto-generated updates from the NEAR Protocol OpenAPI specification.
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "feat: update generated Swift types from OpenAPI spec
 
-            ## Changes
-            - Updated OpenAPI specification from nearcore repository
-            - Regenerated Swift types with latest schema changes
-            - Updated type definitions and enums
-
-            ## Validation
-            - [x] Code generation completed successfully
-            - [x] Swift types compile successfully
-            - [x] All 249 types generated correctly
-            - [x] No compilation errors
-            - [x] No breaking changes detected
-
-            All validation steps are run automatically as part of this workflow.
-          branch: update-generated-code
-          delete-branch: true
-          push-to-fork: ""
+          - Updated OpenAPI specification from nearcore repository
+          - Regenerated Swift types with latest schema changes
+          - Updated type definitions and enums
+          - All 249 types generated correctly
+          - No compilation errors detected"
+          git push
