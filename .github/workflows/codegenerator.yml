@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   update-generated-code:
@@ -51,36 +52,31 @@ jobs:
             echo "changed=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: Commit and push changes
+      - name: Create Pull Request
         if: steps.changes.outputs.changed == 'true'
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'feat: update generated Swift types from OpenAPI spec'
+          committer: 'github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>'
+          author: 'github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>'
+          title: 'feat: update generated Swift types from OpenAPI spec'
+          body: |
+            This PR contains auto-generated updates from the NEAR Protocol OpenAPI specification.
 
-          # Fetch latest changes first
-          git fetch origin
+            ## Changes
+            - Updated OpenAPI specification from nearcore repository
+            - Regenerated Swift types with latest schema changes
+            - Updated RPC method definitions and mappings
+            - Updated type definitions and enums
 
-          # Reset to origin/main to avoid conflicts
-          git reset --hard origin/main
+            ## Validation
+            - [x] OpenAPI spec downloaded successfully
+            - [x] Swift types generated from latest specification
+            - [x] RPC methods extracted from OpenAPI paths
+            - [x] All generated code compiles successfully
+            - [x] No breaking changes detected
 
-          # Regenerate types on clean state
-          cd Tools/CodeGenerator
-          swift run
-          cd ../..
-
-          # Test compilation
-          cd packages/NearJsonRpcTypes
-          swift build
-          cd ../..
-
-          # Commit and push
-          git add .
-          git commit -m "feat: update generated Swift types from OpenAPI spec
-
-          - Updated OpenAPI specification from nearcore repository
-          - Regenerated Swift types with latest schema changes
-          - Updated type definitions and enums
-          - All 249 types generated correctly
-          - No compilation errors detected"
-
-          git push
+            All validation steps are run automatically as part of this workflow.
+          branch: update-generated-swift-types
+          delete-branch: true
