@@ -1,9 +1,6 @@
 name: Update Generated Swift Types from OpenAPI
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
   schedule:
     # Check for updates daily at 6 AM UTC (same as TypeScript project)
