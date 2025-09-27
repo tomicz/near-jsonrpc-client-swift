@@ -109,6 +109,9 @@ func generateSwiftTypes(from json: [String: Any]) {
     
     // Generate client methods
     generateSwiftClientMethods(from: json)
+    
+    // Generate convenience methods
+    generateSwiftConvenienceMethods(from: json)
 }
 
 func generateSwiftMethods(from json: [String: Any]) {
@@ -258,7 +261,7 @@ func generateStruct(name: String, description: String?, schema: [String: Any]) -
         code += "/// \(description.replacingOccurrences(of: "\n", with: "\n/// "))\n"
     }
     
-    code += "public struct \(name): Codable {\n"
+    code += "public struct \(name): Codable, Sendable {\n"
     
     // Add properties
     if let properties = schema["properties"] as? [String: Any] {
@@ -294,7 +297,7 @@ func generateEnum(name: String, description: String?, oneOf: [[String: Any]]) ->
         code += "/// \(description.replacingOccurrences(of: "\n", with: "\n/// "))\n"
     }
     
-    code += "public enum \(name): Codable {\n"
+    code += "public enum \(name): Codable, Sendable {\n"
     
     var caseNames = Set<String>()
     var caseIndex = 0
@@ -383,12 +386,23 @@ func mapOpenAPITypeToSwift(_ prop: [String: Any]) -> String {
         return extractTypeName(from: ref)
     }
     
+    // Handle allOf with references
+    if let allOf = prop["allOf"] as? [[String: Any]], 
+       allOf.count == 1,
+       let ref = allOf[0]["$ref"] as? String {
+        return extractTypeName(from: ref)
+    }
+    
     let type = prop["type"] as? String
     let format = prop["format"] as? String
     
     switch (type, format) {
     case ("integer", "uint64"):
         return "UInt64"
+    case ("integer", "uint32"):
+        return "UInt32"
+    case ("integer", "int64"):
+        return "Int64"
     case ("integer", "int32"):
         return "Int32"
     case ("integer", nil):
@@ -465,7 +479,7 @@ func generateEmptyStruct(name: String, description: String?) -> String {
         code += "/// \(description.replacingOccurrences(of: "\n", with: "\n/// "))\n"
     }
     
-    code += "public struct \(name): Codable {\n"
+    code += "public struct \(name): Codable, Sendable {\n"
     code += "    public init() {}\n"
     code += "}\n\n"
     
@@ -556,6 +570,9 @@ func generateClientMethod(methodName: String, paths: [String: Any], json: [Strin
     // Some methods like status and network_info don't require parameters
     let hasParams = post["requestBody"] != nil && methodName != "status" && methodName != "network_info"
     
+    // Get the response type from OpenAPI spec
+    let responseType = getResponseType(from: post, json: json)
+    
     // Generate method signature
     var methodCode = ""
     
@@ -564,23 +581,261 @@ func generateClientMethod(methodName: String, paths: [String: Any], json: [Strin
         methodCode += "    /// \(description.replacingOccurrences(of: "\n", with: "\n    /// "))\n"
     }
     
-    // Generate method signature
+    // Generate method signature with proper return type
     if hasParams {
-        methodCode += "    public func \(swiftMethodName)(params: [String: Any]) async throws -> [String: Any] {\n"
+        methodCode += "    public func \(swiftMethodName)(params: [String: Any]) async throws -> \(responseType) {\n"
     } else {
-        methodCode += "    public func \(swiftMethodName)() async throws -> [String: Any] {\n"
+        methodCode += "    public func \(swiftMethodName)() async throws -> \(responseType) {\n"
     }
     
     // Generate method body
-    if hasParams {
-        methodCode += "        let response: DictionaryResponse = try await makeRequest(method: .\(methodName), params: params)\n"
+    if responseType == "[String: Any]" {
+        // Use DictionaryResponse for dictionary returns
+        if hasParams {
+            methodCode += "        let response: DictionaryResponse = try await makeRequest(method: .\(methodName), params: params)\n"
+        } else {
+            methodCode += "        let response: DictionaryResponse = try await makeRequest(method: .\(methodName))\n"
+        }
+        methodCode += "        return response.value\n"
     } else {
-        methodCode += "        let response: DictionaryResponse = try await makeRequest(method: .\(methodName))\n"
+        // Use direct return for typed responses
+        if hasParams {
+            methodCode += "        return try await makeRequest(method: .\(methodName), params: params)\n"
+        } else {
+            methodCode += "        return try await makeRequest(method: .\(methodName))\n"
+        }
     }
-    methodCode += "        return response.value\n"
     methodCode += "    }\n\n"
     
     return methodCode
+}
+
+func getResponseType(from post: [String: Any], json: [String: Any]) -> String {
+    // Look for the response schema in the OpenAPI spec
+    guard let responses = post["responses"] as? [String: Any],
+          let response200 = responses["200"] as? [String: Any],
+          let content = response200["content"] as? [String: Any],
+          let applicationJson = content["application/json"] as? [String: Any],
+          let schema = applicationJson["schema"] as? [String: Any],
+          let ref = schema["$ref"] as? String else {
+        return "[String: Any]" // Fallback to dictionary
+    }
+    
+    // Extract the response type from the reference
+    // e.g., "#/components/schemas/JsonRpcResponse_for_RpcStatusResponse_and_RpcError" -> "RpcStatusResponse"
+    let responseType = extractResponseTypeFromRef(ref, json: json)
+    return responseType
+}
+
+func extractResponseTypeFromRef(_ ref: String, json: [String: Any]) -> String {
+    // Extract schema name from reference
+    let schemaName = ref.components(separatedBy: "/").last ?? ""
+    
+    // Look up the schema in components
+    guard let components = json["components"] as? [String: Any],
+          let schemas = components["schemas"] as? [String: Any],
+          let schema = schemas[schemaName] as? [String: Any] else {
+        return "[String: Any]" // Fallback
+    }
+    
+    // For JsonRpcResponse_for_X_and_RpcError, extract the X part
+    if schemaName.hasPrefix("JsonRpcResponse_for_") && schemaName.hasSuffix("_and_RpcError") {
+        let middlePart = String(schemaName.dropFirst(20).dropLast(12)) // Remove prefix and suffix
+        // Remove trailing underscore if present
+        let cleanType = middlePart.hasSuffix("_") ? String(middlePart.dropLast()) : middlePart
+        
+        // Check if this type exists in the generated types
+        if isValidGeneratedType(cleanType, schemas: schemas) {
+            return cleanType
+        } else {
+            // For complex types like Array_of_X or Nullable_X, fall back to dictionary
+            return "[String: Any]"
+        }
+    }
+    
+    // For other schemas, check if they have a oneOf with result property
+    if let oneOf = schema["oneOf"] as? [[String: Any]] {
+        for caseDef in oneOf {
+            if let properties = caseDef["properties"] as? [String: Any],
+               let result = properties["result"] as? [String: Any],
+               let resultRef = result["$ref"] as? String {
+                let typeName = extractTypeName(from: resultRef)
+                if isValidGeneratedType(typeName, schemas: schemas) {
+                    return typeName
+                } else {
+                    return "[String: Any]"
+                }
+            }
+        }
+    }
+    
+    return "[String: Any]" // Fallback
+}
+
+func isValidGeneratedType(_ typeName: String, schemas: [String: Any]) -> Bool {
+    // Check if the type exists in the schemas
+    if let schema = schemas[typeName] as? [String: Any] {
+        // Check if it's an enum with no associated values (like RpcQueryResponse)
+        if let type = schema["type"] as? String, type == "object",
+           let oneOf = schema["oneOf"] as? [[String: Any]] {
+            // If it's a oneOf with only empty cases, it's not useful as a return type
+            let hasUsefulCases = oneOf.contains { caseDef in
+                if let properties = caseDef["properties"] as? [String: Any] {
+                    return !properties.isEmpty
+                }
+                return false
+            }
+            return hasUsefulCases
+        }
+        
+        // Special case: RpcQueryResponse is an enum with no associated values, not useful as return type
+        if typeName == "RpcQueryResponse" {
+            return false
+        }
+        
+        return true
+    }
+    
+    // Check for common patterns that should fall back to dictionary
+    if typeName.hasPrefix("Array_of_") || 
+       typeName.hasPrefix("Nullable_") ||
+       typeName.contains("_of_") {
+        return false
+    }
+    
+    return false
+}
+
+func generateSwiftConvenienceMethods(from json: [String: Any]) {
+    print("Generating convenience methods...")
+    
+    // Generate convenience methods file
+    var generatedCode = generateConvenienceMethodsFileHeader()
+    
+    // Generate convenience methods for common operations
+    generatedCode += generateConvenienceMethod(
+        name: "getStatus",
+        description: "Get network status",
+        returnType: "RpcStatusResponse",
+        methodCall: "status()"
+    )
+    
+    generatedCode += generateConvenienceMethod(
+        name: "getLatestBlock",
+        description: "Get the latest block information",
+        parameters: [("finality", "Finality", "\"final\"")],
+        returnType: "RpcBlockResponse",
+        methodCall: "block(params: [\"finality\": finality])"
+    )
+    
+    generatedCode += generateConvenienceMethod(
+        name: "getBlock",
+        description: "Get block information by ID",
+        parameters: [("blockId", "String", nil)],
+        returnType: "RpcBlockResponse",
+        methodCall: "block(params: [\"block_id\": blockId])"
+    )
+    
+    generatedCode += generateConvenienceMethod(
+        name: "getTransactionStatus",
+        description: "Get transaction status",
+        parameters: [("transactionHash", "String", nil), ("senderAccountId", "String", nil)],
+        returnType: "RpcTransactionResponse",
+        methodCall: "tx(params: [\"transaction_hash\": transactionHash, \"sender_account_id\": senderAccountId])"
+    )
+    
+    generatedCode += generateConvenienceMethod(
+        name: "getGasPrice",
+        description: "Get gas price",
+        parameters: [("blockId", "String?", nil)],
+        returnType: "RpcGasPriceResponse",
+        methodCall: "gasPrice(params: blockId != nil ? [\"block_id\": blockId!] : [:])"
+    )
+    
+    generatedCode += generateConvenienceMethod(
+        name: "getNetworkInfo",
+        description: "Get network information",
+        returnType: "RpcNetworkInfoResponse",
+        methodCall: "networkInfo()"
+    )
+    
+    generatedCode += generateConvenienceMethod(
+        name: "getValidators",
+        description: "Get validators",
+        parameters: [("blockId", "String?", nil)],
+        returnType: "RpcValidatorResponse",
+        methodCall: "validators(params: blockId != nil ? [\"block_id\": blockId!] : [:])"
+    )
+    
+    // Close the extension
+    generatedCode += "}\n"
+    
+    // Save to output file
+    let outputPath = "../../packages/NearJsonRpcClient/Sources/NearJsonRpcClient/ConvenienceMethods.swift"
+    let outputURL = URL(fileURLWithPath: outputPath)
+    
+    do {
+        try generatedCode.write(to: outputURL, atomically: true, encoding: .utf8)
+        print("✅ Generated convenience methods at: \(outputPath)")
+    } catch {
+        print("❌ Error writing convenience methods file: \(error)")
+    }
+}
+
+func generateConvenienceMethodsFileHeader() -> String {
+    return """
+    import Foundation
+    import NearJsonRpcTypes
+
+    // MARK: - Convenience Methods
+
+    extension NearRpcClient {
+
+    """
+}
+
+func generateConvenienceMethod(
+    name: String,
+    description: String,
+    parameters: [(String, String, String?)] = [],
+    returnType: String,
+    methodCall: String
+) -> String {
+    var code = ""
+    
+    // Add documentation
+    code += "    /// \(description)\n"
+    
+    // Add parameter documentation
+    for (paramName, paramType, defaultValue) in parameters {
+        let optionalMark = paramType.hasSuffix("?") ? " (optional)" : ""
+        code += "    /// - Parameter \(paramName): \(paramType)\(optionalMark)\n"
+    }
+    
+    code += "    /// - Returns: \(returnType)\n"
+    
+    // Generate method signature
+    var methodSignature = "    public func \(name)("
+    var methodParams: [String] = []
+    
+    for (paramName, paramType, defaultValue) in parameters {
+        if let defaultValue = defaultValue {
+            methodParams.append("\(paramName): \(paramType) = \(defaultValue)")
+        } else {
+            methodParams.append("\(paramName): \(paramType)")
+        }
+    }
+    
+    methodSignature += methodParams.joined(separator: ", ")
+    methodSignature += ") async throws -> \(returnType) {\n"
+    
+    code += methodSignature
+    
+    // Generate method body
+    code += "        return try await \(methodCall)\n"
+    code += "    }\n\n"
+    
+    return code
 }
 
 func rpcMethodToCamelCase(_ method: String) -> String {
