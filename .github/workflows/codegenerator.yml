@@ -33,9 +33,20 @@ jobs:
         with:
           swift-version: "6.0"
 
+      - name: Install SwiftLint
+        run: |
+          brew install swiftlint
+          echo "SwiftLint installed successfully"
+
       - name: Generate Swift types from OpenAPI spec
         working-directory: Tools/CodeGenerator
         run: swift run
+
+      - name: Lint generated Swift types
+        run: |
+          echo "Running SwiftLint on generated types..."
+          swiftlint lint packages/NearJsonRpcTypes/ --quiet
+          echo "✅ SwiftLint passed - no style violations found"
 
       - name: Test generated types compilation
         run: |
@@ -57,10 +68,10 @@ jobs:
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: 'feat: update generated Swift types from OpenAPI spec'
-          committer: 'github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>'
-          author: 'github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>'
-          title: 'feat: update generated Swift types from OpenAPI spec'
+          commit-message: "feat: update generated Swift types from OpenAPI spec"
+          committer: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+          author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+          title: "feat: update generated Swift types from OpenAPI spec"
           body: |
             This PR contains auto-generated updates from the NEAR Protocol OpenAPI specification.
 
@@ -74,6 +85,7 @@ jobs:
             - [x] OpenAPI spec downloaded successfully
             - [x] Swift types generated from latest specification
             - [x] RPC methods extracted from OpenAPI paths
+            - [x] Generated code passes SwiftLint style checks
             - [x] All generated code compiles successfully
             - [x] No breaking changes detected
 
