@@ -90,7 +90,7 @@ func generateSwiftTypes(from json: [String: Any]) {
     }
     
     // Save to output file
-    let outputPath = "../../packages/NearJsonRpcTypes/Types.swift"
+    let outputPath = "../../Packages/NearJsonRpcTypes/Types.swift"
     let outputURL = URL(fileURLWithPath: outputPath)
     
     // Create directory if it doesn't exist
@@ -136,7 +136,7 @@ func generateSwiftMethods(from json: [String: Any]) {
     generatedCode += generatePathToMethodMap(from: pathToMethodMap)
     
     // Save to output file
-    let outputPath = "../../packages/NearJsonRpcTypes/Methods.swift"
+    let outputPath = "../../Packages/NearJsonRpcTypes/Methods.swift"
     let outputURL = URL(fileURLWithPath: outputPath)
     
     do {
@@ -511,7 +511,7 @@ func generateSwiftClientMethods(from json: [String: Any]) {
     generatedCode += "}\n"
     
     // Save to output file
-    let outputPath = "../../packages/NearJsonRpcClient/Sources/NearJsonRpcClient/GeneratedMethods.swift"
+    let outputPath = "../../Packages/NearJsonRpcClient/Sources/NearJsonRpcClient/GeneratedMethods.swift"
     let outputURL = URL(fileURLWithPath: outputPath)
     
     // Create directory if it doesn't exist
@@ -771,7 +771,7 @@ func generateSwiftConvenienceMethods(from json: [String: Any]) {
     generatedCode += "}\n"
     
     // Save to output file
-    let outputPath = "../../packages/NearJsonRpcClient/Sources/NearJsonRpcClient/ConvenienceMethods.swift"
+    let outputPath = "../../Packages/NearJsonRpcClient/Sources/NearJsonRpcClient/ConvenienceMethods.swift"
     let outputURL = URL(fileURLWithPath: outputPath)
     
     do {
