@@ -20,7 +20,12 @@ let package = Package(
         .target(
             name: "NearJsonRpcTypes",
             dependencies: [],
-            path: "."
+            path: ".",
+            exclude: ["Tests"]
+        ),
+        .testTarget(
+            name: "NearJsonRpcTypesTests",
+            dependencies: ["NearJsonRpcTypes"]
         ),
     ]
 )

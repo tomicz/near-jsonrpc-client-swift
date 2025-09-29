@@ -31,48 +31,55 @@ jobs:
       - name: Test Generated Types Package
         run: |
           echo "Testing NearJsonRpcTypes package compilation..."
-          cd packages/NearJsonRpcTypes
+          cd Packages/NearJsonRpcTypes
           swift build
           echo "✅ NearJsonRpcTypes compiles successfully"
 
       - name: Test Method Mappings
         run: |
           echo "Verifying method mappings are present..."
-          if [ ! -f "packages/NearJsonRpcTypes/Methods.swift" ]; then
+          if [ ! -f "Packages/NearJsonRpcTypes/Methods.swift" ]; then
             echo "❌ Methods.swift not found"
             exit 1
           fi
-          
+
           # Check if RpcMethod enum exists
-          if ! grep -q "public enum RpcMethod" packages/NearJsonRpcTypes/Methods.swift; then
+          if ! grep -q "public enum RpcMethod" Packages/NearJsonRpcTypes/Methods.swift; then
             echo "❌ RpcMethod enum not found in Methods.swift"
             exit 1
           fi
-          
+
           # Check if PATH_TO_METHOD_MAP exists
-          if ! grep -q "PATH_TO_METHOD_MAP" packages/NearJsonRpcTypes/Methods.swift; then
+          if ! grep -q "PATH_TO_METHOD_MAP" Packages/NearJsonRpcTypes/Methods.swift; then
             echo "❌ PATH_TO_METHOD_MAP not found in Methods.swift"
             exit 1
           fi
-          
+
           echo "✅ Method mappings are present and valid"
 
       - name: Test Generated Types
         run: |
           echo "Verifying generated types are present..."
-          if [ ! -f "packages/NearJsonRpcTypes/Types.swift" ]; then
+          if [ ! -f "Packages/NearJsonRpcTypes/Types.swift" ]; then
             echo "❌ Types.swift not found"
             exit 1
           fi
-          
+
           # Check if file has reasonable content
-          type_count=$(grep -c "public struct\|public enum\|public typealias" packages/NearJsonRpcTypes/Types.swift || echo "0")
+          type_count=$(grep -c "public struct\|public enum\|public typealias" Packages/NearJsonRpcTypes/Types.swift || echo "0")
           if [ "$type_count" -lt 100 ]; then
             echo "❌ Types.swift seems incomplete (only $type_count types found)"
             exit 1
           fi
-          
+
           echo "✅ Generated types are present ($type_count types found)"
+
+      - name: Run Unit Tests
+        run: |
+          echo "Running NearJsonRpcTypes unit tests..."
+          cd Packages/NearJsonRpcTypes
+          swift test --verbose
+          echo "✅ All unit tests passed successfully"
 
       - name: Summary
         run: |
@@ -81,3 +88,4 @@ jobs:
           echo "✅ NearJsonRpcTypes package compiles"
           echo "✅ Method mappings are valid"
           echo "✅ Generated types are present"
+          echo "✅ Unit tests passed"
