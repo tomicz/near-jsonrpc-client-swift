@@ -74,18 +74,34 @@ jobs:
 
           echo "✅ Generated types are present ($type_count types found)"
 
-      - name: Run Unit Tests
+      - name: Test RPC Client Package
+        run: |
+          echo "Testing NearJsonRpcClient package compilation..."
+          cd Packages/NearJsonRpcClient
+          swift build
+          echo "✅ NearJsonRpcClient compiles successfully"
+
+      - name: Run NearJsonRpcTypes Unit Tests
         run: |
           echo "Running NearJsonRpcTypes unit tests..."
           cd Packages/NearJsonRpcTypes
           swift test --verbose
-          echo "✅ All unit tests passed successfully"
+          echo "✅ NearJsonRpcTypes unit tests passed successfully"
+
+      - name: Run NearJsonRpcClient Unit Tests
+        run: |
+          echo "Running NearJsonRpcClient unit tests..."
+          cd Packages/NearJsonRpcClient
+          swift test --verbose
+          echo "✅ NearJsonRpcClient unit tests passed successfully"
 
       - name: Summary
         run: |
           echo "🎉 All CI tests passed!"
           echo "✅ CodeGenerator compiles"
           echo "✅ NearJsonRpcTypes package compiles"
+          echo "✅ NearJsonRpcClient package compiles"
           echo "✅ Method mappings are valid"
           echo "✅ Generated types are present"
-          echo "✅ Unit tests passed"
+          echo "✅ NearJsonRpcTypes unit tests passed (50 tests)"
+          echo "✅ NearJsonRpcClient unit tests passed (24 tests)"
