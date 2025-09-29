@@ -10,10 +10,10 @@ class CodableTests: XCTestCase {
     func testFunctionCallActionCodable() {
         // Create a sample FunctionCallAction
         let original = FunctionCallAction(
+            deposit: "1000000000000000000000000", // 1 NEAR in yoctoNEAR as String
             method_name: "test_method",
-            gas: 30000000000000, // 30 TGas as UInt64
             args: "eyJ0ZXN0IjoidmFsdWUifQ==", // base64 encoded JSON
-            deposit: "1000000000000000000000000" // 1 NEAR in yoctoNEAR as String
+            gas: 30000000000000 // 30 TGas as UInt64
         )
         
         // Test round-trip encoding/decoding
@@ -42,8 +42,8 @@ class CodableTests: XCTestCase {
     func testRpcPeerInfoCodable() {
         // Create a sample RpcPeerInfo
         let original = RpcPeerInfo(
-            id: PeerId(),
             account_id: "test.near",
+            id: PeerId(),
             addr: "127.0.0.1:24567"
         )
         
@@ -106,8 +106,8 @@ class CodableTests: XCTestCase {
     func testOptionalPropertiesHandling() {
         // Test RpcPeerInfo with nil values
         let peerWithNils = RpcPeerInfo(
-            id: PeerId(),
             account_id: nil, // Optional property
+            id: PeerId(),
             addr: nil // Optional property
         )
         
@@ -131,10 +131,10 @@ class CodableTests: XCTestCase {
         let largeDeposit = "999999999999999999999999999" // Very large number as string
         
         let action = FunctionCallAction(
+            deposit: largeDeposit,
             method_name: "large_numbers_test",
-            gas: 300000000000000, // Large gas as UInt64
             args: "",
-            deposit: largeDeposit
+            gas: 300000000000000 // Large gas as UInt64
         )
         
         XCTAssertNoThrow({
@@ -152,10 +152,10 @@ class CodableTests: XCTestCase {
         let specialArgs = "eyJ0ZXN0IjogIuKAnHNwZWNpYWwgY2hhcnPigJ0ifQ==" // base64 with special chars
         
         let action = FunctionCallAction(
+            deposit: "0",
             method_name: specialMethod,
-            gas: 30000000000000,
             args: specialArgs,
-            deposit: "0"
+            gas: 30000000000000
         )
         
         XCTAssertNoThrow({
@@ -170,10 +170,10 @@ class CodableTests: XCTestCase {
     func testEmptyStringHandling() {
         // Test with empty strings
         let actionWithEmpties = FunctionCallAction(
+            deposit: "0",
             method_name: "", // Empty method name
-            gas: 30000000000000,
             args: "", // Empty args
-            deposit: "0"
+            gas: 30000000000000
         )
         
         XCTAssertNoThrow({
@@ -192,10 +192,10 @@ class CodableTests: XCTestCase {
     func testJSONFormatCompliance() {
         // Test that encoded JSON is valid and readable
         let action = FunctionCallAction(
+            deposit: "1000000000000000000000000",
             method_name: "test_method",
-            gas: 30000000000000,
             args: "eyJ0ZXN0IjoidmFsdWUifQ==",
-            deposit: "1000000000000000000000000"
+            gas: 30000000000000
         )
         
         do {
@@ -224,10 +224,10 @@ class CodableTests: XCTestCase {
     func testCodablePerformance() {
         // Test encoding/decoding performance with multiple operations
         let action = FunctionCallAction(
+            deposit: "1000000000000000000000000",
             method_name: "performance_test",
-            gas: 30000000000000,
             args: "eyJ0ZXN0IjoidmFsdWUifQ==",
-            deposit: "1000000000000000000000000"
+            gas: 30000000000000
         )
         
         measure {
