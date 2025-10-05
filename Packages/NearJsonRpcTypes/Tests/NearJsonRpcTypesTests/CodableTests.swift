@@ -10,10 +10,10 @@ class CodableTests: XCTestCase {
     func testFunctionCallActionCodable() {
         // Create a sample FunctionCallAction
         let original = FunctionCallAction(
-            method_name: "test_method",
-            deposit: "1000000000000000000000000", // 1 NEAR in yoctoNEAR as String
             args: "eyJ0ZXN0IjoidmFsdWUifQ==", // base64 encoded JSON
-            gas: 30000000000000 // 30 TGas as UInt64
+            gas: 30000000000000, // 30 TGas as UInt64
+            deposit: "1000000000000000000000000", // 1 NEAR in yoctoNEAR as String
+            method_name: "test_method"
         )
         
         // Test round-trip encoding/decoding
@@ -42,9 +42,9 @@ class CodableTests: XCTestCase {
     func testRpcPeerInfoCodable() {
         // Create a sample RpcPeerInfo
         let original = RpcPeerInfo(
-            account_id: "test.near",
             addr: "127.0.0.1:24567",
-            id: PeerId()
+            id: PeerId(),
+            account_id: "test.near"
         )
         
         // Test round-trip encoding/decoding
@@ -106,9 +106,9 @@ class CodableTests: XCTestCase {
     func testOptionalPropertiesHandling() {
         // Test RpcPeerInfo with nil values
         let peerWithNils = RpcPeerInfo(
-            account_id: nil, // Optional property
             addr: nil, // Optional property
-            id: PeerId()
+            id: PeerId(),
+            account_id: nil // Optional property
         )
         
         XCTAssertNoThrow({
@@ -131,10 +131,10 @@ class CodableTests: XCTestCase {
         let largeDeposit = "999999999999999999999999999" // Very large number as string
         
         let action = FunctionCallAction(
-            method_name: "large_numbers_test",
-            deposit: largeDeposit,
             args: "",
-            gas: 300000000000000 // Large gas as UInt64
+            gas: 300000000000000, // Large gas as UInt64
+            deposit: largeDeposit,
+            method_name: "large_numbers_test"
         )
         
         XCTAssertNoThrow({
@@ -152,10 +152,10 @@ class CodableTests: XCTestCase {
         let specialArgs = "eyJ0ZXN0IjogIuKAnHNwZWNpYWwgY2hhcnPigJ0ifQ==" // base64 with special chars
         
         let action = FunctionCallAction(
-            method_name: specialMethod,
-            deposit: "0",
             args: specialArgs,
-            gas: 30000000000000
+            gas: 30000000000000,
+            deposit: "0",
+            method_name: specialMethod
         )
         
         XCTAssertNoThrow({
@@ -170,10 +170,10 @@ class CodableTests: XCTestCase {
     func testEmptyStringHandling() {
         // Test with empty strings
         let actionWithEmpties = FunctionCallAction(
-            method_name: "", // Empty method name
-            deposit: "0",
             args: "", // Empty args
-            gas: 30000000000000
+            gas: 30000000000000,
+            deposit: "0",
+            method_name: "" // Empty method name
         )
         
         XCTAssertNoThrow({
@@ -192,10 +192,10 @@ class CodableTests: XCTestCase {
     func testJSONFormatCompliance() {
         // Test that encoded JSON is valid and readable
         let action = FunctionCallAction(
-            method_name: "test_method",
-            deposit: "1000000000000000000000000",
             args: "eyJ0ZXN0IjoidmFsdWUifQ==",
-            gas: 30000000000000
+            gas: 30000000000000,
+            deposit: "1000000000000000000000000",
+            method_name: "test_method"
         )
         
         do {
@@ -224,10 +224,10 @@ class CodableTests: XCTestCase {
     func testCodablePerformance() {
         // Test encoding/decoding performance with multiple operations
         let action = FunctionCallAction(
-            method_name: "performance_test",
-            deposit: "1000000000000000000000000",
             args: "eyJ0ZXN0IjoidmFsdWUifQ==",
-            gas: 30000000000000
+            gas: 30000000000000,
+            deposit: "1000000000000000000000000",
+            method_name: "performance_test"
         )
         
         measure {
