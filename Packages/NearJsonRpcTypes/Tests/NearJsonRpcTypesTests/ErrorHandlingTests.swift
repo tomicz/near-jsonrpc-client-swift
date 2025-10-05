@@ -94,8 +94,8 @@ class ErrorHandlingTests: XCTestCase {
     func testNestedStructureHandling() {
         // Test complex nested structures like ValidatorKickoutView
         let kickoutView = ValidatorKickoutView(
-            account_id: "validator.near",
-            reason: ValidatorKickoutReason.case0(NotEnoughBlocks: "100")
+            reason: ValidatorKickoutReason.case0(NotEnoughBlocks: "100"),
+            account_id: "validator.near"
         )
         
         // Test round-trip encoding/decoding of nested structure
@@ -111,10 +111,10 @@ class ErrorHandlingTests: XCTestCase {
     func testOptionalChainHandling() {
         // Test structures with multiple optional properties like RpcSplitStorageInfoResponse
         let storageInfo = RpcSplitStorageInfoResponse(
-            head_height: 1000000,
-            cold_head_height: nil,
+            hot_db_kind: "RocksDB",
             final_head_height: nil,
-            hot_db_kind: "RocksDB"
+            cold_head_height: nil,
+            head_height: 1000000
         )
         
         // Test with mixed nil and non-nil values
@@ -130,10 +130,10 @@ class ErrorHandlingTests: XCTestCase {
         
         // Test with all nil values
         let allNilStorage = RpcSplitStorageInfoResponse(
-            head_height: nil,
-            cold_head_height: nil,
+            hot_db_kind: nil,
             final_head_height: nil,
-            hot_db_kind: nil
+            cold_head_height: nil,
+            head_height: nil
         )
         
         XCTAssertNoThrow({
@@ -150,8 +150,8 @@ class ErrorHandlingTests: XCTestCase {
     func testLargeStructureHandling() {
         // Test structures with many properties like StorageUsageConfigView
         let storageConfig = StorageUsageConfigView(
-            num_bytes_account: 100,
-            num_extra_bytes_record: 40
+            num_extra_bytes_record: 40,
+            num_bytes_account: 100
         )
         
         // Test serialization of structure with multiple UInt64 properties
@@ -169,8 +169,8 @@ class ErrorHandlingTests: XCTestCase {
     func testUInt64BoundaryValues() {
         // Test with UInt64 maximum and minimum values
         let maxValueConfig = StorageUsageConfigView(
-            num_bytes_account: UInt64.max,
-            num_extra_bytes_record: UInt64.max
+            num_extra_bytes_record: UInt64.max,
+            num_bytes_account: UInt64.max
         )
         
         // Test UInt64.max serialization
@@ -183,8 +183,8 @@ class ErrorHandlingTests: XCTestCase {
         })
         
         let minValueConfig = StorageUsageConfigView(
-            num_bytes_account: UInt64.min,
-            num_extra_bytes_record: UInt64.min
+            num_extra_bytes_record: UInt64.min,
+            num_bytes_account: UInt64.min
         )
         
         // Test UInt64.min (0) serialization
@@ -203,8 +203,8 @@ class ErrorHandlingTests: XCTestCase {
         let veryLongMethodName = String(repeating: "test_method_", count: 100) + "end"
         
         let actionWithLongStrings = FunctionCallAction(
-            deposit: String(repeating: "9", count: 50), // Very large number as string
             method_name: veryLongMethodName,
+            deposit: String(repeating: "9", count: 50), // Very large number as string
             args: String(repeating: "eyJkYXRhIjoidGVzdCJ9", count: 50), // Long base64 string
             gas: 30000000000000
         )
@@ -224,8 +224,8 @@ class ErrorHandlingTests: XCTestCase {
     func testEmptyAndNilStringHandling() {
         // Test with empty strings and nil values
         let emptyStringAction = FunctionCallAction(
-            deposit: "0", // Zero deposit
             method_name: "", // Empty method name
+            deposit: "0", // Zero deposit
             args: "", // Empty args
             gas: 0 // Zero gas
         )
@@ -243,8 +243,8 @@ class ErrorHandlingTests: XCTestCase {
         // Test optional string handling
         let peerWithNils = RpcPeerInfo(
             account_id: nil,
-            id: PeerId(),
-            addr: nil
+            addr: nil,
+            id: PeerId()
         )
         
         XCTAssertNoThrow({
@@ -269,8 +269,8 @@ class ErrorHandlingTests: XCTestCase {
         
         for value in edgeCaseValues {
             let config = StorageUsageConfigView(
-                num_bytes_account: value,
-                num_extra_bytes_record: value
+                num_extra_bytes_record: value,
+                num_bytes_account: value
             )
             
             XCTAssertNoThrow({
@@ -324,8 +324,8 @@ class ErrorHandlingTests: XCTestCase {
     func testMissingTrieValueHandling() {
         // Test MissingTrieValue structure (common in state queries)
         let missingValue = MissingTrieValue(
-            hash: "ed25519:hash_value_here",
-            context: MissingTrieValueContext.triestorage
+            context: MissingTrieValueContext.triestorage,
+            hash: "ed25519:hash_value_here"
         )
         
         XCTAssertNoThrow({
@@ -361,8 +361,8 @@ class ErrorHandlingTests: XCTestCase {
     func testComplexStructureJSONCompliance() {
         // Test complex structure JSON format
         let kickoutView = ValidatorKickoutView(
-            account_id: "test.near",
-            reason: ValidatorKickoutReason.case0(NotEnoughBlocks: "100")
+            reason: ValidatorKickoutReason.case0(NotEnoughBlocks: "100"),
+            account_id: "test.near"
         )
         
         do {
@@ -410,8 +410,8 @@ class ErrorHandlingTests: XCTestCase {
     func testComplexStructurePerformance() {
         // Test performance of complex structure operations
         let kickoutView = ValidatorKickoutView(
-            account_id: "test.near",
-            reason: ValidatorKickoutReason.case0(NotEnoughBlocks: "100")
+            reason: ValidatorKickoutReason.case0(NotEnoughBlocks: "100"),
+            account_id: "test.near"
         )
         
         measure {
