@@ -75,7 +75,7 @@ jobs:
       - name: Run Tests
         run: |
           echo "Running tests for both packages..."
-          
+
           # Run NearJsonRpcTypes tests with error handling
           cd Packages/NearJsonRpcTypes
           if swift test --verbose; then
@@ -90,7 +90,7 @@ jobs:
               exit 1
             fi
           fi
-          
+
           # Run NearJsonRpcClient tests with error handling
           cd ../NearJsonRpcClient
           if swift test --verbose; then
@@ -105,7 +105,7 @@ jobs:
               exit 1
             fi
           fi
-          
+
           echo "✅ All tests completed successfully"
 
       - name: Lint Generated Code
@@ -118,15 +118,15 @@ jobs:
       - name: Create Release Assets
         run: |
           echo "Creating release assets..."
-          
+
           # Create source distribution for NearJsonRpcTypes
           cd Packages/NearJsonRpcTypes
           swift package generate-xcodeproj
-          
+
           # Create source distribution for NearJsonRpcClient  
           cd ../NearJsonRpcClient
           swift package generate-xcodeproj
-          
+
           echo "✅ Release assets created successfully"
 
       - name: Upload Release Assets
