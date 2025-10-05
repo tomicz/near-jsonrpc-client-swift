@@ -111,10 +111,10 @@ class ErrorHandlingTests: XCTestCase {
     func testOptionalChainHandling() {
         // Test structures with multiple optional properties like RpcSplitStorageInfoResponse
         let storageInfo = RpcSplitStorageInfoResponse(
-            hot_db_kind: "RocksDB",
-            final_head_height: nil,
             cold_head_height: nil,
-            head_height: 1000000
+            final_head_height: nil,
+            head_height: 1000000,
+            hot_db_kind: "RocksDB"
         )
         
         // Test with mixed nil and non-nil values
@@ -130,10 +130,10 @@ class ErrorHandlingTests: XCTestCase {
         
         // Test with all nil values
         let allNilStorage = RpcSplitStorageInfoResponse(
-            hot_db_kind: nil,
-            final_head_height: nil,
             cold_head_height: nil,
-            head_height: nil
+            final_head_height: nil,
+            head_height: nil,
+            hot_db_kind: nil
         )
         
         XCTAssertNoThrow({

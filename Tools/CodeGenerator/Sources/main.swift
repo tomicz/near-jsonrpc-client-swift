@@ -267,7 +267,8 @@ func generateStruct(name: String, description: String?, schema: [String: Any]) -
     if let properties = schema["properties"] as? [String: Any] {
         let required = schema["required"] as? [String] ?? []
         
-        for (propName, propDef) in properties {
+        // Sort properties by name to ensure consistent order
+        for (propName, propDef) in properties.sorted(by: { $0.key < $1.key }) {
             if let prop = propDef as? [String: Any] {
                 let propDescription = prop["description"] as? String
                 let swiftType = mapOpenAPITypeToSwift(prop)
@@ -362,7 +363,8 @@ func generateInitializer(name: String, schema: [String: Any]) -> String {
     var parameters: [String] = []
     
     // Sort properties by name to ensure consistent parameter order
-    for (propName, propDef) in properties.sorted(by: { $0.key < $1.key }) {
+    let sortedProperties = properties.sorted(by: { $0.key < $1.key })
+    for (propName, propDef) in sortedProperties {
         let isOptional = !required.contains(propName)
         let optionalMark = isOptional ? "?" : ""
         let swiftType = mapOpenAPITypeToSwift(propDef as? [String: Any] ?? [:])
@@ -374,7 +376,7 @@ func generateInitializer(name: String, schema: [String: Any]) -> String {
     code += ") {\n"
     
     // Sort properties by name to ensure consistent assignment order
-    for (propName, _) in properties.sorted(by: { $0.key < $1.key }) {
+    for (propName, _) in sortedProperties {
         code += "        self.\(propName) = \(propName)\n"
     }
     
