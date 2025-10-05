@@ -1,10 +1,7 @@
 {
   "packages": {
-    "Packages/NearJsonRpcTypes": {
-      "release-type": "node"
-    },
-    "Packages/NearJsonRpcClient": {
-      "release-type": "node"
+    ".": {
+      "release-type": "simple"
     }
   },
   "changelog-sections": [
