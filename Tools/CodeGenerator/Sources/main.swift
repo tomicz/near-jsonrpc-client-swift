@@ -361,7 +361,8 @@ func generateInitializer(name: String, schema: [String: Any]) -> String {
     var code = "\n    public init("
     var parameters: [String] = []
     
-    for (propName, propDef) in properties {
+    // Sort properties by name to ensure consistent parameter order
+    for (propName, propDef) in properties.sorted(by: { $0.key < $1.key }) {
         let isOptional = !required.contains(propName)
         let optionalMark = isOptional ? "?" : ""
         let swiftType = mapOpenAPITypeToSwift(propDef as? [String: Any] ?? [:])
@@ -372,7 +373,8 @@ func generateInitializer(name: String, schema: [String: Any]) -> String {
     code += parameters.joined(separator: ", ")
     code += ") {\n"
     
-    for (propName, _) in properties {
+    // Sort properties by name to ensure consistent assignment order
+    for (propName, _) in properties.sorted(by: { $0.key < $1.key }) {
         code += "        self.\(propName) = \(propName)\n"
     }
     

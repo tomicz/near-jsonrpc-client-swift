@@ -11,8 +11,8 @@ class CodableTests: XCTestCase {
         // Create a sample FunctionCallAction
         let original = FunctionCallAction(
             args: "eyJ0ZXN0IjoidmFsdWUifQ==", // base64 encoded JSON
-            gas: 30000000000000, // 30 TGas as UInt64
             deposit: "1000000000000000000000000", // 1 NEAR in yoctoNEAR as String
+            gas: 30000000000000, // 30 TGas as UInt64
             method_name: "test_method"
         )
         
@@ -42,9 +42,9 @@ class CodableTests: XCTestCase {
     func testRpcPeerInfoCodable() {
         // Create a sample RpcPeerInfo
         let original = RpcPeerInfo(
+            account_id: "test.near",
             addr: "127.0.0.1:24567",
-            id: PeerId(),
-            account_id: "test.near"
+            id: PeerId()
         )
         
         // Test round-trip encoding/decoding
@@ -106,9 +106,9 @@ class CodableTests: XCTestCase {
     func testOptionalPropertiesHandling() {
         // Test RpcPeerInfo with nil values
         let peerWithNils = RpcPeerInfo(
+            account_id: nil, // Optional property
             addr: nil, // Optional property
-            id: PeerId(),
-            account_id: nil // Optional property
+            id: PeerId()
         )
         
         XCTAssertNoThrow({
@@ -132,8 +132,8 @@ class CodableTests: XCTestCase {
         
         let action = FunctionCallAction(
             args: "",
-            gas: 300000000000000, // Large gas as UInt64
             deposit: largeDeposit,
+            gas: 300000000000000, // Large gas as UInt64
             method_name: "large_numbers_test"
         )
         
@@ -153,8 +153,8 @@ class CodableTests: XCTestCase {
         
         let action = FunctionCallAction(
             args: specialArgs,
-            gas: 30000000000000,
             deposit: "0",
+            gas: 30000000000000,
             method_name: specialMethod
         )
         
@@ -171,8 +171,8 @@ class CodableTests: XCTestCase {
         // Test with empty strings
         let actionWithEmpties = FunctionCallAction(
             args: "", // Empty args
-            gas: 30000000000000,
             deposit: "0",
+            gas: 30000000000000,
             method_name: "" // Empty method name
         )
         
@@ -193,8 +193,8 @@ class CodableTests: XCTestCase {
         // Test that encoded JSON is valid and readable
         let action = FunctionCallAction(
             args: "eyJ0ZXN0IjoidmFsdWUifQ==",
-            gas: 30000000000000,
             deposit: "1000000000000000000000000",
+            gas: 30000000000000,
             method_name: "test_method"
         )
         
@@ -225,8 +225,8 @@ class CodableTests: XCTestCase {
         // Test encoding/decoding performance with multiple operations
         let action = FunctionCallAction(
             args: "eyJ0ZXN0IjoidmFsdWUifQ==",
-            gas: 30000000000000,
             deposit: "1000000000000000000000000",
+            gas: 30000000000000,
             method_name: "performance_test"
         )
         
