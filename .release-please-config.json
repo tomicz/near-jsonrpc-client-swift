@@ -1,0 +1,22 @@
+{
+  "packages": {
+    "Packages/NearJsonRpcTypes": {
+      "release-type": "swift"
+    },
+    "Packages/NearJsonRpcClient": {
+      "release-type": "swift"
+    }
+  },
+  "changelog-sections": [
+    { "type": "feat", "section": "Features" },
+    { "type": "fix", "section": "Bug Fixes" },
+    { "type": "docs", "section": "Documentation" },
+    { "type": "chore", "section": "Miscellaneous", "hidden": false },
+    { "type": "refactor", "section": "Code Refactoring" },
+    { "type": "perf", "section": "Performance Improvements" },
+    { "type": "test", "section": "Tests" }
+  ],
+  "bump-minor-pre-major": true,
+  "bump-patch-for-minor-pre-major": true,
+  "changelog-type": "github"
+}
