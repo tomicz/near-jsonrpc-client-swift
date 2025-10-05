@@ -51,6 +51,7 @@ jobs:
       - name: Test generated types compilation
         run: |
           cd packages/NearJsonRpcTypes
+          swift package clean
           swift build
           echo "Generated types compile successfully"
 

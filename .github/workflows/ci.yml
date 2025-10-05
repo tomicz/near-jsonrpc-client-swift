@@ -25,6 +25,7 @@ jobs:
         run: |
           echo "Testing CodeGenerator compilation..."
           cd Tools/CodeGenerator
+          swift package clean
           swift build
           echo "✅ CodeGenerator compiles successfully"
 
@@ -32,6 +33,7 @@ jobs:
         run: |
           echo "Testing NearJsonRpcTypes package compilation..."
           cd Packages/NearJsonRpcTypes
+          swift package clean
           swift build
           echo "✅ NearJsonRpcTypes compiles successfully"
 
@@ -78,6 +80,7 @@ jobs:
         run: |
           echo "Testing NearJsonRpcClient package compilation..."
           cd Packages/NearJsonRpcClient
+          swift package clean
           swift build
           echo "✅ NearJsonRpcClient compiles successfully"
 
@@ -85,6 +88,7 @@ jobs:
         run: |
           echo "Running NearJsonRpcTypes unit tests..."
           cd Packages/NearJsonRpcTypes
+          swift package clean
           swift test --verbose
           echo "✅ NearJsonRpcTypes unit tests passed successfully"
 
@@ -92,6 +96,7 @@ jobs:
         run: |
           echo "Running NearJsonRpcClient unit tests..."
           cd Packages/NearJsonRpcClient
+          swift package clean
           swift test --verbose
           echo "✅ NearJsonRpcClient unit tests passed successfully"
 
