@@ -1,10 +1,10 @@
 {
   "packages": {
     "Packages/NearJsonRpcTypes": {
-      "release-type": "swift"
+      "release-type": "node"
     },
     "Packages/NearJsonRpcClient": {
-      "release-type": "swift"
+      "release-type": "node"
     }
   },
   "changelog-sections": [
