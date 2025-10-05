@@ -118,15 +118,16 @@ jobs:
       - name: Create Release Assets
         run: |
           echo "Creating release assets..."
-
-          # Create source distribution for NearJsonRpcTypes
+          
+          # Create source archives for Swift Package Manager
           cd Packages/NearJsonRpcTypes
-          swift package generate-xcodeproj
-
-          # Create source distribution for NearJsonRpcClient  
+          swift package resolve
+          echo "✅ NearJsonRpcTypes package resolved"
+          
           cd ../NearJsonRpcClient
-          swift package generate-xcodeproj
-
+          swift package resolve
+          echo "✅ NearJsonRpcClient package resolved"
+          
           echo "✅ Release assets created successfully"
 
       - name: Upload Release Assets
@@ -134,10 +135,11 @@ jobs:
         with:
           name: swift-packages-release
           path: |
-            Packages/NearJsonRpcTypes/*.xcodeproj
-            Packages/NearJsonRpcClient/*.xcodeproj
             Packages/NearJsonRpcTypes/Package.swift
             Packages/NearJsonRpcClient/Package.swift
+            Packages/NearJsonRpcTypes/Types.swift
+            Packages/NearJsonRpcTypes/Methods.swift
+            Packages/NearJsonRpcClient/Sources/
           retention-days: 30
 
   publish-swift-packages:
