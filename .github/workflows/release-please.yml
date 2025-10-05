@@ -118,16 +118,16 @@ jobs:
       - name: Create Release Assets
         run: |
           echo "Creating release assets..."
-          
+
           # Create source archives for Swift Package Manager
           cd Packages/NearJsonRpcTypes
           swift package resolve
           echo "✅ NearJsonRpcTypes package resolved"
-          
+
           cd ../NearJsonRpcClient
           swift package resolve
           echo "✅ NearJsonRpcClient package resolved"
-          
+
           echo "✅ Release assets created successfully"
 
       - name: Upload Release Assets
@@ -151,7 +151,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install Swift
-        uses: fwal/setup-swift@v4
+        uses: fwal/setup-swift@v2
         with:
           swift-version: ${{ env.SWIFT_VERSION }}
 
