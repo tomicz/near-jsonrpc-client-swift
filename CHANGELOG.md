@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1 (2025-10-08)
+
+**Full Changelog**: https://github.com/tomicz/near-jsonrpc-client-swift/compare/v1.1.0...v1.1.1
+
 ## 1.1.0 (2025-10-06)
 
 ## What's Changed
