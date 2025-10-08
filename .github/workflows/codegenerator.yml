@@ -45,12 +45,12 @@ jobs:
       - name: Lint generated Swift types
         run: |
           echo "Running SwiftLint on generated types..."
-          swiftlint lint packages/NearJsonRpcTypes/ --quiet
+          swiftlint lint Packages/NearJsonRpcTypes/ --quiet
           echo "✅ SwiftLint passed - no style violations found"
 
       - name: Test generated types compilation
         run: |
-          cd packages/NearJsonRpcTypes
+          cd Packages/NearJsonRpcTypes
           swift package clean
           swift build
           echo "Generated types compile successfully"

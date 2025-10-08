@@ -16,13 +16,13 @@ if ! command -v swiftlint &> /dev/null; then
 fi
 
 echo "📦 Linting generated types..."
-swiftlint lint packages/NearJsonRpcTypes/ --quiet
+swiftlint lint Packages/NearJsonRpcTypes/ --quiet
 
 if [ $? -eq 0 ]; then
     echo "✅ Generated types passed SwiftLint checks!"
 else
     echo "❌ Generated types have linting issues."
-    echo "   Run 'swiftlint lint packages/NearJsonRpcTypes/' to see details."
+    echo "   Run 'swiftlint lint Packages/NearJsonRpcTypes/' to see details."
     exit 1
 fi
 
@@ -30,4 +30,4 @@ echo ""
 echo "🎉 Linting complete!"
 echo ""
 echo "💡 To run linting manually:"
-echo "   swiftlint lint packages/NearJsonRpcTypes/"
+echo "   swiftlint lint Packages/NearJsonRpcTypes/"
