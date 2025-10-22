@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.6.0 (2025-10-21)
+
+## What's Changed
+* feat: update generated Swift types from OpenAPI spec by @github-actions[bot] in https://github.com/tomicz/near-jsonrpc-client-swift/pull/28
+
+
+**Full Changelog**: https://github.com/tomicz/near-jsonrpc-client-swift/compare/v1.5.0...v1.6.0
+
 ## 1.5.0 (2025-10-15)
 
 ## What's Changed
